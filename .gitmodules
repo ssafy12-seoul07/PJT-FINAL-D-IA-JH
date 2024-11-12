@@ -1,0 +1,3 @@
+[submodule "housework-api"]
+	path = housework-api
+	url = https://github.com/newbieJanghan/Housework-API.git
