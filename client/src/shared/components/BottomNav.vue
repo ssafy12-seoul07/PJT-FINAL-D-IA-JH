@@ -9,25 +9,15 @@
 </template>
 
 <script setup lang="ts">
-  import { RouterLink } from 'vue-router'
-  import { computed, ref, watch } from 'vue'
-  import type { BottomNavProps } from '../interface/NavigationInterface'
-  import { useRoute } from 'vue-router'
+  import { RouterLink, useRoute } from 'vue-router'
+  import { computed } from 'vue'
+  import type { BottomNavProps } from '../interface/NavigationInterface.ts'
 
   const navigationMenu = defineProps<BottomNavProps>()
   const route = useRoute()
-  const isActive = ref(false)
-
-  watch(
-    () => route.path,
-    (newPath) => {
-      if (newPath.includes(navigationMenu.navTo)) {
-        isActive.value = true
-      } else {
-        isActive.value = false
-      }
-    }
-  )
+  const isActive = computed(() => {
+    return route.path.includes(navigationMenu.navTo)
+  })
 
   const color = computed(() => ({
     color: isActive.value ? navigationMenu.activeColor : '#757575',

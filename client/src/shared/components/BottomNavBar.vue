@@ -8,7 +8,7 @@
   import BottomNav from './BottomNav.vue'
   import { ref } from 'vue'
   import type { BottomNavProps } from '../interface/NavigationInterface'
-  import { MENU_LIST } from '../../modules/shell/constants/NavigationConstants'
+  import { MENU_LIST } from '@/shared/constants/NavigationConstants';
 
   const menuList = ref<BottomNavProps[]>(MENU_LIST)
 </script>

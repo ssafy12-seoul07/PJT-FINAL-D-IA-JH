@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { HeaderActionButtonProps } from '../../modules/shell/interface/HeaderActionButtonInterface'
+  import type { HeaderActionButtonProps } from '@/shared/interface/HeaderActionButtonInterface.ts'
   const props = defineProps<HeaderActionButtonProps>()
 
   const emit = defineEmits(['on-click'])

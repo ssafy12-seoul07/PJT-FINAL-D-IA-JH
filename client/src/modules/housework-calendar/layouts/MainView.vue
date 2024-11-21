@@ -19,11 +19,13 @@
       </template>
     </BaseHeader>
     <h1>houseworks</h1>
+    <BottomNavBar />
   </div>
 </template>
 
 <script setup lang="ts">
   import BaseHeader from '@/shared/components/BaseHeader.vue'
+import BottomNavBar from '@/shared/components/BottomNavBar.vue';
   import HeaderActionButton from '@/shared/components/HeaderActionButton.vue'
   import HeaderTitle from '@/shared/components/HeaderTitle.vue'
   import { useRouter } from 'vue-router'
