@@ -6,6 +6,7 @@
     :label-col="labelCol"
     :wrapper-col="wrapperCol"
     :colon="false"
+    @submit="onSubmit"
   >
     <a-form-item ref="name" label="이름" name="name">
       <a-input v-model:value="formState.name" />
@@ -49,25 +50,29 @@
         <a-radio value="2">Venue</a-radio>
       </a-radio-group>
     </a-form-item>
+
+    <a-form-item :wrapper-col="{ offset: 16, span: 16 }">
+      <a-button type="primary" html-type="submit">가입하기</a-button>
+    </a-form-item>
   </a-form>
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue'
-  import type { UnwrapRef } from 'vue'
+
+  import { ref, reactive, toRaw } from 'vue'
   import type { Rule } from 'ant-design-vue/es/form'
   import type { RegisterFormProps } from '../interface/AuthenticationInterface.js'
 
   const formRef = ref()
   const labelCol = { span: 6 }
-  const wrapperCol = { span: 18 }
-  const formState: UnwrapRef<FormState> = reactive<RegisterFormProps>({
+  const wrapperCol = { span: 24 }
+  const formState = reactive<RegisterFormProps>({
     name: '',
     email: '',
     password: '',
     familyId: null,
     goalKcal: 0,
-    profileImageName: null,
+    profileImageName: "",
     noFamily: false,
   })
 
@@ -111,11 +116,14 @@
       },
     ],
     familyId: [
-      {
-        required: true,
-        message: '본인의 들어갈 가족ID를 입력해주세요.',
+    {required: true,
+        validator: async (_rule: Rule, value: number) => {
+          if (!value && !formState.noFamily) {
+            throw new Error('가족ID를 입력하거나 1인가구를 선택해주세요');
+          }
+        },
         trigger: ['change', 'blur'],
-      },
+      }
     ],
     goalKcal: [
       {
@@ -139,16 +147,16 @@
     ],
   }
 
-  // const onSubmit = () => {
-  //   formRef.value
-  //     .validate()
-  //     .then(() => {
-  //       console.log('values', formState, toRaw(formState))
-  //     })
-  //     .catch((error) => {
-  //       console.log('error', error)
-  //     })
-  // }
+  const onSubmit = () => {
+    formRef.value
+      .validate()
+      .then(() => {
+        console.log('values', formState, toRaw(formState))
+      })
+      .catch((error: unknown) => {
+        console.log('error', error)
+      })
+  }
 
   // const resetForm = () => {
   //   formRef.value.resetFields()

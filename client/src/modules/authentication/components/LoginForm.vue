@@ -1,5 +1,6 @@
 <template>
   <a-form
+  ref="formRef"
     :model="formState"
     :rules="rules"
     @finish="handleFinish"
@@ -25,34 +26,50 @@
     </a-form-item>
     <a-form-item>
       <a-button type="primary" html-type="submit" :disabled="isSubmitDisabled">
-        Log in
+        로그인
       </a-button>
     </a-form-item>
   </a-form>
 </template>
 
 <script lang="ts" setup>
-  import { reactive, UnwrapRef, computed } from 'vue'
+  import { ref, reactive, computed, watch } from 'vue'
   import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-  import type { FormProps } from 'ant-design-vue'
+  import type { FormProps, FormInstance } from 'ant-design-vue'
   import type { LoginFormProps } from '../interface/AuthenticationInterface.ts'
-  import type { Rule, FormInstance } from 'ant-design-vue/es/form'
+  import type { Rule } from 'ant-design-vue/es/form'
 
   const formRef = ref<FormInstance>()
-  const formState: UnwrapRef<LoginFormProps> = reactive({
+  const formState = reactive<LoginFormProps>({
     email: '',
     password: '',
   })
 
-  const isSubmitDisabled = computed(() => {
-    if (!formState.email || !formState.password) return true
+  const isValid = ref(false)
 
-    // 현재 form의 validation 상태 확인
-    const isValid = formRef.value
-      ?.getFieldsError()
-      .every((item) => item.errors.length === 0)
-    return !isValid
-  })
+// watch를 사용하여 폼 상태 변경 감지 및 validation
+watch(
+  [() => formState.email, () => formState.password],
+  async () => {
+    if (!formState.email || !formState.password) {
+      isValid.value = false
+      return
+    }
+
+    try {
+      await formRef.value?.validate()
+      isValid.value = true
+    } catch {
+      isValid.value = false
+    }
+  },
+  { immediate: true }
+)
+
+  // computed는 동기적으로 상태 반환
+const isSubmitDisabled = computed(() => {
+  return !formState.email || !formState.password || !isValid.value
+})
 
   const rules: Record<string, Rule[]> = {
     email: [

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <span>{{ hours }}:{{ formattedMinutes }}</span>
+      <span>{{ formattedHours }}:{{ formattedMinutes }}</span>
       <font-awesome-icon icon="comment-dots" />
     </div>
     <div>
@@ -17,6 +17,9 @@
 
   const hours = ref(new Date().getHours())
   const minutes = ref(new Date().getMinutes())
+  const formattedHours = computed(() => {
+    return hours.value.toString().padStart(2, '0')
+  })
   const formattedMinutes = computed(() => {
     return minutes.value.toString().padStart(2, '0')
   })
