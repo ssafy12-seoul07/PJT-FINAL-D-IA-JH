@@ -61,6 +61,7 @@
 
     span {
       white-space: nowrap;
+      font-size: 12px;
     }
 
     > div {
