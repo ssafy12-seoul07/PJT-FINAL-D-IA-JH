@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="my-daily-view">
     <BaseHeader>
       <template #left>
         <HeaderActionButton icon="child-reaching" />
@@ -13,7 +13,25 @@
         />
       </template>
     </BaseHeader>
-    <h1>my-daily</h1>
+    <main>
+      <div class="main-container">
+        <h3>김싸피님의 활동링</h3>
+        <ActivityRing />
+        <div style="min-height: 16px" />
+        <h3>김싸피님의 일정 (시작시간 빠른순)</h3>
+        <HouseworkTask />
+        <HouseworkTask />
+        <HouseworkTask />
+        <HouseworkTask />
+        <HouseworkTask />
+        <HouseworkTask />
+        <HouseworkTask />
+        <HouseworkTask />
+        <HouseworkTask />
+        <HouseworkTask />
+        <HouseworkTask />
+      </div>
+    </main>
     <BottomNavBar />
   </div>
 </template>
@@ -24,6 +42,8 @@
   import HeaderTitle from '@/shared/components/HeaderTitle.vue'
   import BottomNavBar from '@/shared/components/BottomNavBar.vue'
   import { useRouter } from 'vue-router'
+  import ActivityRing from '@/shared/components/ActivityRing.vue'
+  import HouseworkTask from '@/shared/components/HouseworkTask.vue'
 
   const router = useRouter()
   const handleAction = (action: string) => {
@@ -37,4 +57,40 @@
   }
 </script>
 
-<style scoped></style>
+<style scoped>
+  div.my-daily-view {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-bottom-right-radius: 24px;
+    border-bottom-left-radius: 24px;
+
+    main {
+      flex: 1;
+      width: 100%;
+      background-color: #f0f0f0;
+      padding: 12px;
+
+      .main-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        width: 100%;
+        overflow: scroll;
+        -ms-overflow-style: none; /* IE, Edge */
+        scrollbar-width: none; /* Firefox */
+        h3 {
+          color: #757575;
+          margin: 8px;
+        }
+
+        height: 725px; /* 가로가 430 이상일때 */
+        @media (max-width: 430px) {
+          height: calc(100vh - 160px); /* 가로가 430 이하일때 */
+        }
+      }
+    }
+  }
+</style>

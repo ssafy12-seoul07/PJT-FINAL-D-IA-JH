@@ -2,7 +2,6 @@
   <div class="mobile-container">
     <PhoneHeader class="phone-header" />
     <RouterView />
-    <div class="router-view"></div>
   </div>
 </template>
 
@@ -26,6 +25,7 @@
     .mobile-container {
       /* mobile phone size */
       width: 100vw;
+      min-width: 360px;
       height: 100vh;
       border-radius: 0;
       box-shadow: none;

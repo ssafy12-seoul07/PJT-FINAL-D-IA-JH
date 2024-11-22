@@ -42,6 +42,8 @@
     &:hover {
       background-color: white;
       transition: 0.1s ease-in-out;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
     }
 
     svg {
