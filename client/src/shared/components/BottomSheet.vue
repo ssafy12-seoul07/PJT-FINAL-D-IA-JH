@@ -48,7 +48,6 @@
           >
             <a-select
               v-model:value="formState.assignedUserId"
-              mode="multiple"
               style="width: 100%"
               placeholder="맡은 사람"
               option-label-prop="children"
@@ -138,7 +137,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import dayjs from 'dayjs'
   import timezone from 'dayjs/plugin/timezone'
   import utc from 'dayjs/plugin/utc'
@@ -151,7 +150,11 @@
   import type { HouseworkInterface } from '../interface/HouseworkInterface'
   import useIsFullDay from '../composables/useIsFullDay'
   import { useUserStore } from '@/modules/authentication/store/user'
+
   const userStore = useUserStore()
+  onMounted(async () => {
+    await userStore.getFamilyInfo()
+  })
   const familyList = computed(() => userStore.familyInfo?.members || null)
 
   const getProfileImagePath = (profileImageName: string | null) => {
@@ -183,7 +186,7 @@
         ? useIsFullDay(props.startAt, props.dueAt)
         : false,
     doneAt: props.doneAt ?? '',
-    assignedUserId: props.assignedUserId ? [props.assignedUserId] : [],
+    assignedUserId: props.assignedUserId ?? '',
   })
 
   const labelCol = { span: 8 }
