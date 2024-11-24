@@ -81,12 +81,13 @@
             <a-time-range-picker
               v-model:value="formState.timeRange"
               :placeholder="['시작 시각', '종료 시각']"
+              :disabled="formState.isAllDay"
             />
             <a-form-item-rest>
               <a-checkbox
                 v-model:checked="formState.isAllDay"
                 style="margin-left: 8px"
-                >하루 종일</a-checkbox
+                >하루종일</a-checkbox
               >
             </a-form-item-rest>
           </a-form-item>
@@ -164,7 +165,7 @@
   // 한국 시간대 설정
   dayjs.tz.setDefault('Asia/Seoul')
 
-  const props = defineProps<HouseworkInterface>()
+  const props = defineProps<Partial<HouseworkInterface>>()
 
   const mode = ref<'create' | 'read' | 'edit'>(props.name ? 'read' : 'create')
 
