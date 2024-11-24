@@ -39,17 +39,14 @@
               /></template>
             </a-input>
           </a-form-item>
-          <a-form-item label="구분색" name="color">
-            <a-color-picker v-model="formState.color" placeholder="color" />
+          <a-form-item name="color">
+            <a-color-picker v-model="formState.color" />
           </a-form-item>
-          <a-form-item
-            :label="mode === 'create' ? '맡을 사람' : '맡은 사람'"
-            name="assignedUserId"
-          >
+          <a-form-item name="assignedUserId">
             <a-select
               v-model:value="formState.assignedUserId"
               style="width: 100%"
-              placeholder="맡은 사람"
+              :placeholder="mode === 'create' ? '맡을 사람' : '맡은 사람'"
               option-label-prop="children"
               maxTagCount="1"
             >
@@ -76,7 +73,7 @@
               </a-select-option>
             </a-select>
           </a-form-item>
-          <a-form-item name="timeRange" label="시작시간 - 종료시간">
+          <a-form-item name="timeRange">
             <a-time-range-picker
               v-model:value="formState.timeRange"
               :placeholder="['시작 시각', '종료 시각']"
@@ -121,7 +118,7 @@
             </a-input>
           </a-form-item>
           <a-form-item placeholder="TimeRange" name="timeRange"> </a-form-item>
-          <div class="button-container">
+          <div class="button-container" v-if="mode === 'read'">
             <a-form-item>
               <a-button danger type="primary">삭제</a-button>
             </a-form-item>
@@ -175,7 +172,7 @@
   const formState = ref({
     name: props.name ?? '',
     description: props.description ?? '',
-    color: props.color ?? '',
+    color: props.color ?? '구분색',
     calorieAmount: props.calorieAmount ?? '',
     timeRange: [
       props.startAt ? dayjs(props.startAt).tz() : '',
@@ -186,7 +183,7 @@
         ? useIsFullDay(props.startAt, props.dueAt)
         : false,
     doneAt: props.doneAt ?? '',
-    assignedUserId: props.assignedUserId ?? '',
+    assignedUserId: props.assignedUserId ?? null,
   })
 
   const labelCol = { span: 8 }
