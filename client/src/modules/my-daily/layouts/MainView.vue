@@ -1,35 +1,29 @@
 <template>
   <div class="my-daily-view">
-    <BaseHeader>
-      <template #left>
-        <HeaderActionButton icon="child-reaching" />
-        <HeaderTitle title="나의 하루" />
-      </template>
-      <template #right>
-        <HeaderActionButton
-          icon="gear"
-          action="setting"
-          @on-click="handleAction"
-        />
-      </template>
-    </BaseHeader>
+    <MyDailyHeader />
     <main>
       <div class="main-container">
-        <h3>김싸피님의 활동링</h3>
-        <ActivityRing />
+        <h3>{{ myName }}님의 활동링</h3>
+        <template v-if="myWorkoutStat && myWorkoutStat.userId">
+          <ActivityRing
+            v-show="myWorkoutStat && myWorkoutStat.userId"
+            :key="myWorkoutStat?.userId"
+            v-bind="myWorkoutStat"
+          />
+        </template>
         <div style="min-height: 16px" />
-        <h3>김싸피님의 일정 (시작시간 빠른순)</h3>
-        <HouseworkTask />
-        <HouseworkTask />
-        <HouseworkTask />
-        <HouseworkTask />
-        <HouseworkTask />
-        <HouseworkTask />
-        <HouseworkTask />
-        <HouseworkTask />
-        <HouseworkTask />
-        <HouseworkTask />
-        <HouseworkTask />
+        <h3>{{ myName }}님의 일정 (시작시간 빠른순)</h3>
+        <template v-if="myHousework?.length">
+          <HouseworkTask
+            v-show="myHousework.length"
+            v-for="task in myHousework"
+            :key="task.id"
+            v-bind="task"
+          />
+        </template>
+        <template v-else>
+          <h3>아직 저장된 일정이 없습니다</h3>
+        </template>
       </div>
     </main>
     <BottomNavBar />
@@ -37,24 +31,27 @@
 </template>
 
 <script setup lang="ts">
-  import BaseHeader from '@/shared/components/BaseHeader.vue'
-  import HeaderActionButton from '@/shared/components/HeaderActionButton.vue'
-  import HeaderTitle from '@/shared/components/HeaderTitle.vue'
+  import MyDailyHeader from '../components/MyDailyHeader.vue'
   import BottomNavBar from '@/shared/components/BottomNavBar.vue'
-  import { useRouter } from 'vue-router'
   import ActivityRing from '@/shared/components/ActivityRing.vue'
   import HouseworkTask from '@/shared/components/HouseworkTask.vue'
 
-  const router = useRouter()
-  const handleAction = (action: string) => {
-    switch (action) {
-      case 'back':
-        router.back()
-        break
-      case 'setting':
-        router.push({ name: 'Setting' })
-    }
-  }
+  import useMyDaily from '../composables/useMyDaily'
+  import { onMounted } from 'vue'
+
+  const {
+    myName,
+    myWorkoutStat,
+    myHousework,
+    getMyName,
+    getMyWorkoutStat,
+    getMyTodayHousework,
+  } = useMyDaily()
+  onMounted(async () => {
+    await getMyName()
+    await getMyWorkoutStat()
+    await getMyTodayHousework()
+  })
 </script>
 
 <style scoped>

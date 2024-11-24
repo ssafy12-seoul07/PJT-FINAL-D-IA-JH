@@ -1,14 +1,10 @@
 import { API_BASE_URL } from '@/shared/constants/API'
-import { useAuthStore } from '../store/auth'
+import { useAuthStore } from '@/modules/authentication/store/auth'
 import axios from 'axios'
-import type {
-  LoginFormProps,
-  RegisterBodyInterface,
-} from '../interface/AuthenticationInterface'
 import { useErrorHandling } from '@/shared/composables/useErrorHandling'
 
 // API 클래스를 함수로 변경
-export function useAuthAPI() {
+export function useFamilyDailyAPI() {
   const authStore = useAuthStore()
   const { setupInterceptors } = useErrorHandling()
 
@@ -35,22 +31,14 @@ export function useAuthAPI() {
 
   const api = createAPIInstance()
 
-  const postAuthSignup = async (body: RegisterBodyInterface) => {
+  const getFamilyWorkoutStat = async () => {
     const {
       data: { body: responseBody },
-    } = await api.post('/auth/signup', body)
-    return responseBody
-  }
-
-  const postAuthLogin = async (body: LoginFormProps) => {
-    const {
-      data: { body: responseBody },
-    } = await api.post('/auth/login', body)
+    } = await api.get('/workout-stats/my-family')
     return responseBody
   }
 
   return {
-    postAuthSignup,
-    postAuthLogin,
+    getFamilyWorkoutStat,
   }
 }

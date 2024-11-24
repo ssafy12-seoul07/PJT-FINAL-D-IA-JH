@@ -35,24 +35,19 @@
 <script lang="ts" setup>
   import { ref, reactive, computed, watch } from 'vue'
   import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-  import { type FormProps, type FormInstance, message } from 'ant-design-vue'
+  import type { FormInstance } from 'ant-design-vue'
   import type { LoginFormProps } from '../interface/AuthenticationInterface'
   import type { Rule } from 'ant-design-vue/es/form'
-  import { useAuthAPI } from '../service/AuthAPI.js'
-  import { useAuthStore } from '../store/auth.js'
-  import { useRouter } from 'vue-router'
+  import { useLoginSubmit } from '../composables/useLoginSubmit'
 
   const formRef = ref<FormInstance>()
   const formState = reactive<LoginFormProps>({
     email: '',
     password: '',
   })
-  const authAPI = useAuthAPI()
-  const authStore = useAuthStore()
-  const router = useRouter()
+  const { handleFinish, handleFinishFailed } = useLoginSubmit()
 
   const isValid = ref(false)
-  const loading = ref(false)
 
   // watch를 사용하여 폼 상태 변경 감지 및 validation
   watch(
@@ -98,29 +93,6 @@
         trigger: ['change', 'blur'],
       },
     ],
-  }
-
-  const handleFinish: FormProps['onFinish'] = async (values) => {
-    loading.value = true
-    try {
-      const response = await authAPI.postAuthLogin(values as LoginFormProps)
-      console.log(response)
-
-      // 로그인 성공 시 토큰 저장
-      authStore.setAccessToken(response.accessToken)
-
-      // 로그인 성공 메시지
-      message.success('로그인되었습니다')
-
-      // 메인 페이지로 이동
-      router.push({ name: 'MyDaily' })
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const handleFinishFailed: FormProps['onFinishFailed'] = (errors) => {
-    console.log(errors)
   }
 </script>
 

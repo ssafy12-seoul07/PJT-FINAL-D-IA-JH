@@ -1,14 +1,11 @@
 import { API_BASE_URL } from '@/shared/constants/API'
-import { useAuthStore } from '../store/auth'
+import { useAuthStore } from '@/modules/authentication/store/auth'
 import axios from 'axios'
-import type {
-  LoginFormProps,
-  RegisterBodyInterface,
-} from '../interface/AuthenticationInterface'
 import { useErrorHandling } from '@/shared/composables/useErrorHandling'
+import useFormatDate from '../../../shared/composables/useFormatDate'
 
 // API 클래스를 함수로 변경
-export function useAuthAPI() {
+export function useMyDailyAPI() {
   const authStore = useAuthStore()
   const { setupInterceptors } = useErrorHandling()
 
@@ -35,22 +32,28 @@ export function useAuthAPI() {
 
   const api = createAPIInstance()
 
-  const postAuthSignup = async (body: RegisterBodyInterface) => {
+  const getMyWorkoutStat = async () => {
     const {
       data: { body: responseBody },
-    } = await api.post('/auth/signup', body)
+    } = await api.get('/workout-stats/my')
     return responseBody
   }
 
-  const postAuthLogin = async (body: LoginFormProps) => {
+  const getMyHousework = async (from: Date, to: Date, userId?: number) => {
     const {
       data: { body: responseBody },
-    } = await api.post('/auth/login', body)
+    } = await api.get('/family-houseworks', {
+      params: {
+        from: useFormatDate(from), // 날짜를 ISO 문자열로 변환
+        to: useFormatDate(to),
+        ...(userId && { assignedUserId: userId }), // userId가 있을 때만 포함
+      },
+    })
     return responseBody
   }
 
   return {
-    postAuthSignup,
-    postAuthLogin,
+    getMyWorkoutStat,
+    getMyHousework,
   }
 }

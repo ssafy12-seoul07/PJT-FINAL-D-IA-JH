@@ -1,28 +1,14 @@
 <template>
   <div class="family-daily-view">
-    <BaseHeader>
-      <template #left>
-        <HeaderActionButton icon="people-roof" />
-        <HeaderTitle title="가족의 하루" />
-      </template>
-      <template #right>
-        <HeaderActionButton
-          icon="gear"
-          action="setting"
-          @on-click="handleAction"
-        />
-      </template>
-    </BaseHeader>
+    <FamilyDailyHeader />
     <main>
       <div class="main-container">
         <h3>{{ formattedDate }}</h3>
-        <ActivityRing />
-        <ActivityRing />
-        <ActivityRing />
-        <ActivityRing />
-        <ActivityRing />
-        <ActivityRing />
-        <ActivityRing />
+        <ActivityRing
+          v-for="member in familyWorkoutStat"
+          :key="member.userId"
+          v-bind="member"
+        />
       </div>
     </main>
     <BottomNavBar />
@@ -31,30 +17,18 @@
 
 <script setup lang="ts">
   import ActivityRing from '@/shared/components/ActivityRing.vue'
-  import BaseHeader from '@/shared/components/BaseHeader.vue'
   import BottomNavBar from '@/shared/components/BottomNavBar.vue'
-  import HeaderActionButton from '@/shared/components/HeaderActionButton.vue'
-  import HeaderTitle from '@/shared/components/HeaderTitle.vue'
-  import { useRouter } from 'vue-router'
+  import FamilyDailyHeader from '../components/FamilyDailyHeader.vue'
+  import useFormatDate from '../composables/useFormatDate'
+  const { getTodayFormatted } = useFormatDate()
+  const formattedDate = getTodayFormatted()
 
-  const router = useRouter()
-  const handleAction = (action: string) => {
-    switch (action) {
-      case 'back':
-        router.back()
-        break
-      case 'setting':
-        router.push({ name: 'Setting' })
-    }
-  }
-
-  const today = new Date()
-  const formattedDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일 (${getDayKorean(today.getDay())}) 오늘`
-
-  function getDayKorean(day: number) {
-    const days = ['일', '월', '화', '수', '목', '금', '토']
-    return days[day]
-  }
+  import useFamilyDaily from '../composables/useFamilyDaily'
+  import { onMounted } from 'vue'
+  const { familyWorkoutStat, getFamilyWorkoutStat } = useFamilyDaily()
+  onMounted(async () => {
+    await getFamilyWorkoutStat()
+  })
 </script>
 
 <style scoped>

@@ -19,6 +19,7 @@
     border-radius: 24px;
     display: flex;
     flex-direction: column;
+    position: relative;
   }
 
   @media (max-width: 430px) {
