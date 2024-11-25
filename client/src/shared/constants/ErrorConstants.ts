@@ -1,5 +1,6 @@
 export const HTTP_STATUS = {
   OK: 200,
+  NO_CONTENT: 204,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
@@ -13,4 +14,3 @@ export const DEFAULT_ERROR = {
   DETAIL: '예상치 못한 오류가 발생했습니다',
   STATUS: HTTP_STATUS.INTERNAL_SERVER_ERROR,
 } as const
- 

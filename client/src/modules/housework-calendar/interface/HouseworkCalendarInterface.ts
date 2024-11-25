@@ -23,6 +23,7 @@ export interface TaskListInterface {
 }
 
 export interface HouseworkFormProps {
+  id?: number
   assignedUserId: number
   name: string
   description: string

@@ -26,6 +26,9 @@
           @finish="handleSubmitForm"
           @finishFailed="handleFinishFailed"
         >
+          <a-form-item name="id" hidden>
+            <a-input v-model:value="formState.id" />
+          </a-form-item>
           <a-form-item name="name">
             <a-input v-model:value="formState.name" placeholder="집안일 제목">
               <template #prefix
@@ -122,16 +125,22 @@
               </template>
             </a-input>
           </a-form-item>
-          <div class="button-container" v-if="mode === 'read'">
-            <a-form-item>
-              <a-button danger type="primary">삭제</a-button>
-            </a-form-item>
-            <a-form-item>
-              <a-button v-if="formState.doneAt">미완료</a-button>
-              <a-button v-else type="primary">완료</a-button>
-            </a-form-item>
-          </div>
         </a-form>
+        <div class="button-container" v-if="mode === 'read' && id">
+          <a-form-item>
+            <a-button danger type="primary" @click="handleTaskDelete(id)"
+              >삭제</a-button
+            >
+          </a-form-item>
+          <a-form-item>
+            <a-button v-if="formState.doneAt" @click="handleTaskOngoing(id)"
+              >미완료</a-button
+            >
+            <a-button v-else type="primary" @click="handleTaskComplete(id)"
+              >완료</a-button
+            >
+          </a-form-item>
+        </div>
       </main>
     </div>
   </div>
@@ -148,7 +157,10 @@
     FireOutlined,
     InfoCircleOutlined,
   } from '@ant-design/icons-vue'
-  import type { HouseworkInterface } from '../interface/HouseworkInterface'
+  import type {
+    HouseworkFormModeType,
+    HouseworkInterface,
+  } from '../interface/HouseworkInterface'
   import useIsFullDay from '../composables/useIsFullDay'
   import { useUserStore } from '@/modules/authentication/store/user'
   import { TASK_DEFAULT_COLOR } from '../constants/HouseworkConstants'
@@ -173,10 +185,11 @@
 
   const props = defineProps<Partial<HouseworkInterface>>()
 
-  const mode = ref<'create' | 'read' | 'edit'>(props.name ? 'read' : 'create')
+  const mode = ref<HouseworkFormModeType>(props.name ? 'read' : 'create')
 
   const formState = ref({
-    name: props.name || '',
+    id: props.id ?? '',
+    name: props.name ?? '',
     description: props.description ?? '',
     color: props.color ?? TASK_DEFAULT_COLOR,
     calorieAmount: props.calorieAmount ?? '',
@@ -201,26 +214,8 @@
     emit('onClose', 'close')
   }
 
-  const handleEditForm = async () => {
-    mode.value = 'read'
-  }
-
-  import { useHouseworkSubmit } from '@/modules/housework-calendar/composables/useHouseworkSubmit'
-  import type { FormProps } from 'ant-design-vue'
-  const { handleFinish, handleFinishFailed } = useHouseworkSubmit()
-
-  const handleSubmitForm: FormProps['onFinish'] = async (values) => {
-    try {
-      await handleFinish(values)
-      handleCloseBottomSheet()
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const triggerFormSubmit = async () => {
-    const values = await formRef.value?.validateFields()
-    handleSubmitForm(values)
+  const handleEditForm = () => {
+    mode.value = 'edit'
   }
 
   const rules = {
@@ -257,6 +252,83 @@
       formRef.value?.validateFields(['timeRange'])
     }
   )
+
+  import { useHouseworkSubmit } from '@/modules/housework-calendar/composables/useHouseworkSubmit'
+  import type { FormProps } from 'ant-design-vue'
+  import type { HouseworkFormProps } from '@/modules/housework-calendar/interface/HouseworkCalendarInterface'
+  const { handleFinish, handleFinishFailed } = useHouseworkSubmit()
+
+  const handleSubmitForm: FormProps['onFinish'] = async (
+    values: HouseworkFormProps
+  ) => {
+    try {
+      await handleFinish(values, mode.value)
+      await myDailyStore.refreshMyWorkoutStat()
+      handleCloseBottomSheet()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const triggerFormSubmit = async () => {
+    const values = await formRef.value?.validateFields()
+    if (values) {
+      handleSubmitForm(values)
+    }
+  }
+
+  import useHouseworkActions from '../composables/useHouseworkActions'
+  const { deleteHousework, completeHousework, setHouseworkOngoing } =
+    useHouseworkActions()
+  import { useMyDailyStore } from '@/modules/my-daily/store/my-daily'
+  const myDailyStore = useMyDailyStore()
+
+  const handleTaskDelete = async (id: number) => {
+    try {
+      await deleteHousework(id)
+      if (myDailyStore.myHousework) {
+        myDailyStore.myHousework = [
+          ...myDailyStore.myHousework.filter(
+            (housework) => housework.id !== id
+          ),
+        ]
+      }
+      await myDailyStore.refreshMyWorkoutStat()
+      handleCloseBottomSheet()
+    } catch (error) {
+      console.error('Failed to delete housework:', error)
+    }
+  }
+
+  const handleTaskComplete = async (id: number) => {
+    try {
+      const response = await completeHousework(id)
+      if (myDailyStore.myHousework) {
+        myDailyStore.myHousework = myDailyStore.myHousework.map((housework) =>
+          housework.id === id ? response : housework
+        )
+      }
+      await myDailyStore.refreshMyWorkoutStat()
+      handleCloseBottomSheet()
+    } catch (error) {
+      console.error('Failed to complete housework:', error)
+    }
+  }
+
+  const handleTaskOngoing = async (id: number) => {
+    try {
+      const response = await setHouseworkOngoing(id)
+      if (myDailyStore.myHousework) {
+        myDailyStore.myHousework = myDailyStore.myHousework.map((housework) =>
+          housework.id === id ? response : housework
+        )
+      }
+      await myDailyStore.refreshMyWorkoutStat()
+      handleCloseBottomSheet()
+    } catch (error) {
+      console.error('Failed to set housework ongoing:', error)
+    }
+  }
 </script>
 
 <style scoped>
