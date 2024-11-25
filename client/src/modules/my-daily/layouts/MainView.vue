@@ -15,8 +15,8 @@
         <h3>{{ myName }}님의 일정 (시작시간 빠른순)</h3>
         <template v-if="myHousework?.length">
           <HouseworkTask
-            v-show="myHousework.length"
-            v-for="task in myHousework"
+            v-show="sortedMyHousework.length"
+            v-for="task in sortedMyHousework"
             :key="task.id"
             v-bind="task"
           />
@@ -37,7 +37,7 @@
   import HouseworkTask from '@/shared/components/HouseworkTask.vue'
 
   import useMyDaily from '../composables/useMyDaily'
-  import { onMounted } from 'vue'
+  import { computed, onMounted } from 'vue'
 
   const {
     myName,
@@ -47,10 +47,19 @@
     getMyWorkoutStat,
     getMyTodayHousework,
   } = useMyDaily()
+
   onMounted(async () => {
     await getMyName()
     await getMyWorkoutStat()
     await getMyTodayHousework()
+  })
+
+  const sortedMyHousework = computed(() => {
+    if (!myHousework.value) return []
+
+    return [...myHousework.value].sort((a, b) => {
+      return new Date(a.startAt).getTime() - new Date(b.startAt).getTime()
+    })
   })
 </script>
 
