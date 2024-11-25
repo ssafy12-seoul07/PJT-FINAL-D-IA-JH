@@ -16,13 +16,13 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import useFormatDate2 from '@/shared/composables/useFormatDate2'
   import { useHouseworkCalendarStore } from '@/modules/housework-calendar/store/housework-calendar'
 
   const { startDate, endDate, before, after } = useHouseworkCalendarStore()
-  const from = computed(() => useFormatDate2(startDate))
-  const to = computed(() => useFormatDate2(endDate))
+  const from = ref(useFormatDate2(startDate.value))
+  const to = ref(useFormatDate2(endDate.value))
 
 </script>
 

@@ -30,7 +30,11 @@ export const useHouseworkCalendarStore = defineStore('housework-calendar', () =>
 
   const houseworks = ref<HouseworkInterface[]>([])
   const getHouseworks = async () => {
-    houseworks.value = await houseworkAPI.getHousework(startDate.value, endDate.value)
+    if (houseworks.value.length == 0) {
+      houseworks.value = await houseworkAPI.getHousework(startDate.value, endDate.value)
+    }
+
+    return houseworks;
   }
 
   return {
@@ -50,12 +54,18 @@ export const useHouseworkCalendarStore = defineStore('housework-calendar', () =>
 // utils
 const getFirstDayOfWeek = () => {
   const dayOfWeek = dayjs().day()
-  return dayOfWeek === 0 ? dayjs().subtract(6, 'day').toDate() : dayjs().day(1).toDate()
+  const date = dayOfWeek === 0 ? dayjs().subtract(6, 'day').toDate() : dayjs().day(1).toDate()
+  date.setHours(0, 0, 0, 0)
+
+  return date;
 }
 
 const getLastDayOfWeek = () => {
   const dayOfWeek = dayjs().day()
-  return dayOfWeek === 0 ? dayjs().toDate() : dayjs().day(7).toDate()
+  const date = dayOfWeek === 0 ? dayjs().toDate() : dayjs().day(7).toDate()
+  date.setHours(23, 59, 59, 999)
+
+  return date;
 }
 
 const prevWeek = (date: Date) => {

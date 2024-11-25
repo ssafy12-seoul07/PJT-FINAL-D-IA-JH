@@ -18,14 +18,14 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
+  import { onMounted, ref } from 'vue'
 
   import { useHouseworkCalendarStore } from '@/modules/housework-calendar/store/housework-calendar'
   import { useWeekdayList, type Weekday } from '@/modules/housework-calendar/composables/useWeekdayList'
   import { useHouseworksPerDate } from '@/modules/housework-calendar/composables/useHouseworksPerDate'
   import { useCalendarKeyOfDate } from '../composables/useCalendarKeyOfDate'
 
-  const { startDate, houseworks } = useHouseworkCalendarStore()
+  const { startDate, getHouseworks } = useHouseworkCalendarStore()
   const weekdayList: Weekday[] = useWeekdayList(startDate)
 
   const weekDayClass = (date: Date) => {
@@ -44,9 +44,11 @@
     return date > today
   }
 
-  console.log("in weekCalendar ", houseworks)
-  const data = computed(() => useHouseworksPerDate(houseworks))
-  console.log("in weekCalendar ", data)
+  const data = ref({})
+  onMounted(async () => {
+    const houseworks = await getHouseworks();
+    data.value = useHouseworksPerDate(houseworks.value);
+  })
 
 </script>
 
