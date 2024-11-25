@@ -6,7 +6,7 @@
         <button @click="handleCloseBottomSheet">
           <font-awesome-icon icon="xmark" />
         </button>
-        <button v-if="mode !== 'read'" @click="handleSubmitForm">
+        <button v-if="mode !== 'read'" @click="triggerFormSubmit">
           <font-awesome-icon icon="check" style="color: var(--green)" />
         </button>
         <button v-else @click="handleEditForm">
@@ -15,21 +15,25 @@
       </header>
       <main>
         <a-form
+          ref="formRef"
           :model="formState"
           layout="vertical"
           :colon="false"
           :label-col="labelCol"
           :wrapper-col="wrapperCol"
           :disabled="mode === 'read'"
+          :rules="rules"
+          @finish="handleSubmitForm"
+          @finishFailed="handleFinishFailed"
         >
-          <a-form-item>
+          <a-form-item name="name">
             <a-input v-model:value="formState.name" placeholder="집안일 제목">
               <template #prefix
                 ><ScheduleOutlined style="color: rgba(0, 0, 0, 0.25)"
               /></template>
             </a-input>
           </a-form-item>
-          <a-form-item>
+          <a-form-item name="description">
             <a-input
               v-model:value="formState.description"
               placeholder="집안일 내용"
@@ -87,11 +91,12 @@
               >
             </a-form-item-rest>
           </a-form-item>
-          <a-form-item>
+          <a-form-item name="calorieAmount">
             <a-input
               v-model:value="formState.calorieAmount"
               placeholder="예상소모 칼로리"
               type="number"
+              min="1"
             >
               <template #prefix
                 ><FireOutlined style="color: rgba(0, 0, 0, 0.25)" />
@@ -117,7 +122,6 @@
               </template>
             </a-input>
           </a-form-item>
-          <a-form-item placeholder="TimeRange" name="timeRange"> </a-form-item>
           <div class="button-container" v-if="mode === 'read'">
             <a-form-item>
               <a-button danger type="primary">삭제</a-button>
@@ -134,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import dayjs from 'dayjs'
   import timezone from 'dayjs/plugin/timezone'
   import utc from 'dayjs/plugin/utc'
@@ -147,7 +151,9 @@
   import type { HouseworkInterface } from '../interface/HouseworkInterface'
   import useIsFullDay from '../composables/useIsFullDay'
   import { useUserStore } from '@/modules/authentication/store/user'
+  import { TASK_DEFAULT_COLOR } from '../constants/HouseworkConstants'
 
+  const formRef = ref()
   const userStore = useUserStore()
   onMounted(async () => {
     await userStore.getFamilyInfo()
@@ -170,13 +176,13 @@
   const mode = ref<'create' | 'read' | 'edit'>(props.name ? 'read' : 'create')
 
   const formState = ref({
-    name: props.name ?? '',
+    name: props.name || '',
     description: props.description ?? '',
-    color: props.color ?? '구분색',
+    color: props.color ?? TASK_DEFAULT_COLOR,
     calorieAmount: props.calorieAmount ?? '',
     timeRange: [
-      props.startAt ? dayjs(props.startAt).tz() : '',
-      props.dueAt ? dayjs(props.dueAt).tz() : '',
+      props.startAt ? dayjs(props.startAt).tz() : null,
+      props.dueAt ? dayjs(props.dueAt).tz() : null,
     ],
     isAllDay:
       props.startAt && props.dueAt
@@ -199,9 +205,58 @@
     mode.value = 'read'
   }
 
-  const handleSubmitForm = async () => {
-    handleCloseBottomSheet()
+  import { useHouseworkSubmit } from '@/modules/housework-calendar/composables/useHouseworkSubmit'
+  import type { FormProps } from 'ant-design-vue'
+  const { handleFinish, handleFinishFailed } = useHouseworkSubmit()
+
+  const handleSubmitForm: FormProps['onFinish'] = async (values) => {
+    try {
+      await handleFinish(values)
+      handleCloseBottomSheet()
+    } catch (error) {
+      console.log(error)
+    }
   }
+
+  const triggerFormSubmit = async () => {
+    const values = await formRef.value?.validateFields()
+    handleSubmitForm(values)
+  }
+
+  const rules = {
+    name: [{ required: true, message: '제목을 입력해주세요' }],
+    description: [{ required: true, message: '내용을 입력해주세요' }],
+    color: [{ required: true, message: '색상을 선택해주세요' }],
+    assignedUserId: [{ required: true, message: '맡을 사람을 선택해주세요' }],
+    timeRange: [
+      {
+        validator: async (_: unknown, value: [Date, Date]) => {
+          if (formState.value.isAllDay) {
+            return Promise.resolve() // isAllDay가 true면 validation 통과
+          }
+          if (!value || !value[0] || !value[1]) {
+            return Promise.reject('시간을 선택하거나 하루종일을 선택해주세요')
+          }
+          return Promise.resolve()
+        },
+      },
+    ],
+    calorieAmount: [
+      { required: true, message: '예상 소모 칼로리를 입력해주세요' },
+    ],
+  }
+
+  // isAllDay 체크박스와 timeRange 연동
+  watch(
+    () => formState.value.isAllDay,
+    (newVal: boolean) => {
+      if (newVal) {
+        formState.value.timeRange = [null, null] // 또는 빈 배열 [] 등 초기값
+      }
+      // timeRange 필드의 검증을 다시 실행
+      formRef.value?.validateFields(['timeRange'])
+    }
+  )
 </script>
 
 <style scoped>

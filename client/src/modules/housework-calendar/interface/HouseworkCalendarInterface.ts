@@ -17,7 +17,18 @@ export interface TaskListInterface {
   description: string
   color: string
   colorieAmount: number
-  startAt: string | Date // "2024-11-11T00:00:00.000Z" 형식
+  startAt: string | Date // "2024-11-11T00:00:00" 형식
   dueAt: string | Date
   doneAt?: string | Date // nullable
+}
+
+export interface HouseworkFormProps {
+  assignedUserId: number
+  name: string
+  description: string
+  color: string
+  calorieAmount: number
+  timeRange?: [Date, Date]
+  startAt?: Date | string
+  dueAt?: Date | string
 }

@@ -38,10 +38,10 @@ const useMyDaily = () => {
   }
 
   const getMyTodayHousework = async () => {
-    // const today = new Date()
-    const today = new Date('2024-11-21') // 오늘 00:00:00
+    const today = new Date()
+    // const today = new Date('2024-11-21') // 오늘 00:00:00
     today.setHours(0, 0, 0, 0)
-    console.log(today)
+
     const endOfDay = new Date(today)
     endOfDay.setHours(23, 59, 59, 999) // 오늘 23:59:59.999
 
