@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <h1>family-daily</h1>
-  </div>
+  <div>houseworklist</div>
 </template>
 
 <script setup lang="ts"></script>

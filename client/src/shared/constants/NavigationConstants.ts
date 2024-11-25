@@ -1,4 +1,4 @@
-import type { BottomNavProps } from '../interface/NavigationInterface'
+import type { BottomNavProps } from '@/shared/interface/NavigationInterface'
 
 export const MENU_LIST: BottomNavProps[] = [
   {

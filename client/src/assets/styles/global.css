@@ -11,9 +11,15 @@
   --red: #dd1601;
   --green: #11d06f;
   --blue: #41a4fd;
+  --orange: #e78834;
 }
 
 * {
+  box-sizing: border-box;
+}
+
+*:before,
+*:after {
   box-sizing: border-box;
 }
 

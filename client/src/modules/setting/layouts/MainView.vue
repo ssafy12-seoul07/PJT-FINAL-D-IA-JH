@@ -2,8 +2,12 @@
   <div>
     <BaseHeader>
       <template #left>
-        <HeaderActionButton icon="chevron-left" @on-click="navigateToBack" />
-        <HeaderTitle title="나의 하루" />
+        <HeaderActionButton
+          icon="chevron-left"
+          action="back"
+          @on-click="handleAction"
+        />
+        <HeaderTitle title="설정" />
       </template>
     </BaseHeader>
     <h1>my-daily</h1>
@@ -17,8 +21,12 @@
   import { useRouter } from 'vue-router'
 
   const router = useRouter()
-  const navigateToBack = () => {
-    router.back()
+  const handleAction = (action: string) => {
+    switch (action) {
+      case 'back':
+        router.back()
+        break
+    }
   }
 </script>
 

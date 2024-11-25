@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <h1>houseworks</h1>
-  </div>
+  <span></span>
 </template>
 
 <script setup lang="ts"></script>
