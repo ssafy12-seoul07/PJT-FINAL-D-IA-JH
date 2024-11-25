@@ -16,17 +16,17 @@
   import HouseworkList from './HouseworkList.vue'
   import { computed, ref } from 'vue'
   import type {
-    TaskListInterface,
-    WeekTaskListInterface,
+    HouseworkInterface,
+    WeekHouseworkInterface,
   } from '../interface/HouseworkCalendarInterface'
 
   const startDate = ref('')
   const endDate = ref('')
-  const weekTaskList = ref<WeekTaskListInterface>()
+  const weekTaskList = ref<WeekHouseworkInterface>()
   const selectedDate = ref('')
 
   // weekTaskList가 ref이므로 .value 필요
-  const selectedDateTaskList = computed<TaskListInterface[]>(
+  const selectedDateTaskList = computed<HouseworkInterface[]>(
     () => weekTaskList.value?.[selectedDate.value] ?? []
   )
 

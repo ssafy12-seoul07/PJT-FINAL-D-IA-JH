@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useErrorHandling } from '@/shared/composables/useErrorHandling'
 import type { HouseworkFormProps } from '../interface/HouseworkCalendarInterface'
 import useFormatDate from '@/shared/composables/useFormatDate'
+import type { HouseworkInterface } from '@/shared/interface/HouseworkInterface'
 
 // API 클래스를 함수로 변경
 export function useHouseworkAPI() {
@@ -36,7 +37,7 @@ export function useHouseworkAPI() {
   const getHousework = async (from: Date, to: Date) => {
     const {
       data: { body: responseBody },
-    } = await api.get('/family-houseworks', {
+    } = await api.get<{body: HouseworkInterface[]}>('/family-houseworks', {
       params: {
         from: useFormatDate(from), // 날짜를 ISO 문자열로 변환
         to: useFormatDate(to),

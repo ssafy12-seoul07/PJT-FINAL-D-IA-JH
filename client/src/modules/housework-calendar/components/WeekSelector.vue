@@ -5,7 +5,7 @@
     >GO BEFORE
     </button>
     <div>
-      <span>{{ useFormatDate2(startDate) }}</span> ~ <span>{{ useFormatDate2(endDate) }}</span>
+      <span>{{ from }}</span> ~ <span>{{ to }}</span>
     </div>
     <button
       @click.prevent="after"
@@ -16,14 +16,14 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
-  import { useCurrentWeekStore } from '@/modules/housework-calendar/store/current-week'
-  import useFormatDate2 from '../../../shared/composables/useFormatDate2'
+  import { computed } from 'vue'
+  import useFormatDate2 from '@/shared/composables/useFormatDate2'
+  import { useHouseworkCalendarStore } from '@/modules/housework-calendar/store/housework-calendar'
 
-  const {getCurrentWeek, before, after} = useCurrentWeekStore();
-  const currentWeek = getCurrentWeek();
-  const startDate = computed(() => useFormatDate2(currentWeek.startDate));
-  const endDate = computed(() => useFormatDate2(currentWeek.endDate));
+  const { startDate, endDate, before, after } = useHouseworkCalendarStore()
+  const from = computed(() => useFormatDate2(startDate))
+  const to = computed(() => useFormatDate2(endDate))
+
 </script>
 
 <style scoped>
@@ -31,6 +31,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 0 10%;
+    margin: 8px 16px;
   }
 </style>

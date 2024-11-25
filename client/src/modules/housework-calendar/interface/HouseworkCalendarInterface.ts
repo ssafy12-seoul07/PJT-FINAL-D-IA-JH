@@ -1,17 +1,17 @@
 // export interface WeekSelectorProps {
-//   startDate: string
-//   endDate: string
+//   startDate: Date
+//   endDate: Date
 // }
 
-export interface WeekCalendarProps {
-  selectedDate: string
+// export interface WeekCalendarProps {
+//   selectedDate: string
+// }
+
+export interface WeekHouseworkInterface {
+  [startDate: string]: HouseworkInterface[]
 }
 
-export interface WeekTaskListInterface {
-  [startDate: string]: TaskListInterface[]
-}
-
-export interface TaskListInterface {
+export interface HouseworkInterface {
   id: number
   name: string
   description: string
