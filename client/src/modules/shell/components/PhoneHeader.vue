@@ -1,11 +1,11 @@
 <template>
   <div>
     <div>
-      <span>{{ hours }}:{{ minutes }}</span>
+      <span>{{ formattedHours }}:{{ formattedMinutes }}</span>
       <font-awesome-icon icon="comment-dots" />
     </div>
     <div>
-      <font-awesome-icon icon="bluetooth-b" />
+      <font-awesome-icon icon="fa-brands fa-bluetooth-b" />
       <font-awesome-icon icon="wifi" />
       <font-awesome-icon icon="battery-full" />
     </div>
@@ -13,10 +13,17 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted } from 'vue'
+  import { ref, onMounted, onUnmounted, computed } from 'vue'
 
   const hours = ref(new Date().getHours())
   const minutes = ref(new Date().getMinutes())
+  const formattedHours = computed(() => {
+    return hours.value.toString().padStart(2, '0')
+  })
+  const formattedMinutes = computed(() => {
+    return minutes.value.toString().padStart(2, '0')
+  })
+
   let timer: ReturnType<typeof setInterval>
 
   onMounted(() => {
@@ -38,6 +45,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 16px;
+    height: 48px;
     svg {
       margin-left: 8px;
     }

@@ -19,10 +19,16 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 
 library.add(fas, far, fab)
 
+import Antd from 'ant-design-vue'
+import ColorPicker from '@elonmuscle/antdv-color-picker'
+import '@elonmuscle/antdv-color-picker/dist/style.css'
+
 const app = createApp(App)
 
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(createPinia())
+app.use(Antd)
 app.use(router)
+app.use(ColorPicker)
 
 app.mount('#app')

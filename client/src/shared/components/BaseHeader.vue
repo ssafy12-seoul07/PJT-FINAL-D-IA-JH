@@ -19,7 +19,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
+    padding: 12px 32px 12px 16px;
     width: 100%;
 
     .header-left,
@@ -27,7 +27,7 @@
     .header-right {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 8px;
     }
 
     .header-center {
