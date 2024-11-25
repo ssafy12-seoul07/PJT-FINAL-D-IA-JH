@@ -6,12 +6,24 @@ import { useUserStore } from '@/modules/authentication/store/user'
 import type { HouseworkFormProps } from '../interface/HouseworkCalendarInterface'
 import type { HouseworkFormModeType } from '@/shared/interface/HouseworkInterface'
 import type { MyHouseworkInterface } from '@/modules/my-daily/interface/MyDailyInterface'
+import { useHouseworkStore } from '../store/houseworks'
 const { formatToKrISOString, getStartOfDay, getEndOfDay } = useDateTime()
+import dayjs from 'dayjs'
 
 export function useHouseworkSubmit() {
   const houseworkAPI = useHouseworkAPI()
   const userStore = useUserStore()
   const myDailyStore = useMyDailyStore()
+  const houseworkStore = useHouseworkStore()
+
+  const updateStores = async (
+    values: HouseworkFormProps,
+    response: MyHouseworkInterface,
+    isEdit = false
+  ) => {
+    await updateMyDailyStore(values, response, isEdit)
+    updateHouseworkStore(response, isEdit)
+  }
 
   const updateMyDailyStore = async (
     values: HouseworkFormProps,
@@ -28,6 +40,37 @@ export function useHouseworkSubmit() {
     } else {
       myDailyStore.myHousework.push({ ...response })
     }
+  }
+
+  const updateHouseworkStore = (
+    response: MyHouseworkInterface,
+    isEdit: boolean
+  ) => {
+    if (!houseworkStore.weekTaskList) return
+
+    const dateKey = dayjs(response.startAt).format('YYYY-MM-DD')
+
+    if (isEdit) {
+      const taskList = houseworkStore.weekTaskList[dateKey]
+      if (!taskList) return
+
+      const index = taskList.findIndex(
+        (housework) => housework.id === response.id
+      )
+      if (index !== -1) {
+        taskList[index] = {
+          ...taskList[index],
+          ...response,
+        }
+      }
+    }
+
+    // weekTaskList가 변경된 후 calendarData 갱신
+    houseworkStore.calendarData = houseworkStore.createCalendarData(
+      houseworkStore.startDate,
+      houseworkStore.endDate,
+      houseworkStore.weekTaskList
+    )
   }
 
   const updateExistingHousework = (
@@ -63,7 +106,7 @@ export function useHouseworkSubmit() {
   const createHousework = async (values: HouseworkFormProps) => {
     const newForm = createNewForm(values)
     const response = await houseworkAPI.postHousework(newForm)
-    await updateMyDailyStore(values, response)
+    await updateStores(values, response, false)
     message.success('집안일이 등록되었습니다')
     return response
   }
@@ -71,7 +114,7 @@ export function useHouseworkSubmit() {
   const updateHousework = async (values: HouseworkFormProps) => {
     const newForm = createNewForm(values)
     const response = await houseworkAPI.patchHousework(values.id!, newForm)
-    await updateMyDailyStore(values, response, true)
+    await updateStores(values, response, true)
     message.success('집안일이 수정되었습니다')
     return response
   }

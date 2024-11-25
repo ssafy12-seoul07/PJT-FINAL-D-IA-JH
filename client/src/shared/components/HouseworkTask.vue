@@ -16,6 +16,7 @@
       v-if="mode === 'open'"
       v-bind="props"
       @on-close="handleCardClick"
+      @click.stop
     />
   </div>
 </template>
@@ -34,16 +35,9 @@
 
   const mode = ref<'open' | 'close'>('close')
 
-  const handleCardClick = (action: string) => {
+  const handleCardClick = (action: 'open' | 'close') => {
     console.log(action)
-    switch (action) {
-      case 'open':
-        mode.value = 'open'
-        break
-      case 'close':
-        mode.value = 'close'
-        break
-    }
+    mode.value = action
   }
 
   const dividerStyle = computed(() => ({

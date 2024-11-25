@@ -1,43 +1,39 @@
 <template>
-  <div>
+  <main>
     <WeekSelector
-      :startDate="startDate"
-      :endDate="endDate"
-      @change-week="handleChangeWeek"
+      :startDate="houseworkStore.startDate"
+      :endDate="houseworkStore.endDate"
+      @change-week="houseworkStore.changeWeek"
     />
-    <WeekCalendar :selectedDate="selectedDate" />
-    <HouseworkList :selectedDateTaskList="selectedDateTaskList" />
-  </div>
+    <WeekCalendar
+      v-if="houseworkStore.calendarData.length"
+      :selectedDate="houseworkStore.selectedDate"
+      :calendarData="houseworkStore.calendarData"
+      @select-date="houseworkStore.selectDate"
+    />
+    <HouseworkList :selectedDateTaskList="computedSelectedDateTaskList" />
+  </main>
 </template>
 
 <script setup lang="ts">
   import WeekSelector from './WeekSelector.vue'
   import WeekCalendar from './WeekCalendar.vue'
   import HouseworkList from './HouseworkList.vue'
-  import { computed, ref } from 'vue'
-  import type {
-    TaskListInterface,
-    WeekTaskListInterface,
-  } from '../interface/HouseworkCalendarInterface'
+  import { useHouseworkStore } from '../store/houseworks'
+  import { computed, onMounted } from 'vue'
+  import { storeToRefs } from 'pinia'
+  const houseworkStore = useHouseworkStore()
+  const { fetchHouseworkData } = houseworkStore
+  // storeToRefs를 사용해서 반응성 유지
+  const { selectedDateTaskList } = storeToRefs(houseworkStore)
 
-  const startDate = ref('')
-  const endDate = ref('')
-  const weekTaskList = ref<WeekTaskListInterface>()
-  const selectedDate = ref('')
+  onMounted(async () => {
+    await fetchHouseworkData()
+  })
 
-  // weekTaskList가 ref이므로 .value 필요
-  const selectedDateTaskList = computed<TaskListInterface[]>(
-    () => weekTaskList.value?.[selectedDate.value] ?? []
+  const computedSelectedDateTaskList = computed(
+    () => selectedDateTaskList.value
   )
-
-  const handleChangeWeek = (action: string) => {
-    switch (action) {
-      case 'prev':
-        break
-      case 'next':
-        break
-    }
-  }
 </script>
 
 <style scoped></style>

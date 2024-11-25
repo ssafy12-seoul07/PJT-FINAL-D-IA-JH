@@ -1,9 +1,6 @@
 <template>
-  <div
-    class="bottom-sheet-overlay-container"
-    @click.stop="handleCloseBottomSheet"
-  >
-    <div class="bottom-sheet-overlay"></div>
+  <div class="bottom-sheet-overlay-container">
+    <div class="bottom-sheet-overlay" @click="handleCloseBottomSheet"></div>
     <div class="bottom-sheet-container">
       <header>
         <button @click="handleCloseBottomSheet">
