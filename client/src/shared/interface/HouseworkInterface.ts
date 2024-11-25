@@ -13,3 +13,5 @@ export interface HouseworkInterface {
   createdAt: Date | string
   updatedAt: Date | string
 }
+
+export type HouseworkFormModeType = 'create' | 'read' | 'edit'

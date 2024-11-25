@@ -1,6 +1,10 @@
 <template>
-  <div class="housework-task-container" @click="handleCardClick('open')">
-    <div class="color-divider"></div>
+  <div
+    class="housework-task-container"
+    @click="handleCardClick('open')"
+    :class="{ completed: isCompleted }"
+  >
+    <div class="color-divider" :style="dividerStyle"></div>
     <div class="task-container">
       <div>[{{ name }}] {{ description }}</div>
       <div>{{ startTime }} ~ {{ dueTime }}</div>
@@ -26,6 +30,7 @@
 
   const startTime = computed(() => useTimeToString(props.startAt))
   const dueTime = computed(() => useTimeToString(props.dueAt))
+  const isCompleted = computed(() => props.doneAt !== null)
 
   const mode = ref<'open' | 'close'>('close')
 
@@ -40,6 +45,10 @@
         break
     }
   }
+
+  const dividerStyle = computed(() => ({
+    backgroundColor: props.color || 'var(--task-default)',
+  }))
 </script>
 
 <style scoped>
@@ -75,5 +84,10 @@
   div.profile-container {
     display: flex;
     align-items: flex-end;
+  }
+  div.completed {
+    background-color: #f6f6f6;
+    color: #757575;
+    text-decoration: line-through;
   }
 </style>

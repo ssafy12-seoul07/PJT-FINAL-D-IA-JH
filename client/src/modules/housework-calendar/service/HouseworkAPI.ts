@@ -60,10 +60,7 @@ export function useHouseworkAPI() {
   }
 
   const deleteHousework = async (id: number) => {
-    const {
-      data: { body: responseBody },
-    } = await api.delete(`/family-houseworks/${id}`)
-    return responseBody
+    await api.delete(`/family-houseworks/${id}`)
   }
 
   const patchHouseworkComplete = async (id: number) => {

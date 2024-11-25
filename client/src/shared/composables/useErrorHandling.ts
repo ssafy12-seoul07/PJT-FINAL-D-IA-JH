@@ -43,6 +43,7 @@ export function useErrorHandling() {
 
     if (
       status === HTTP_STATUS.OK &&
+      body &&
       body.status &&
       body.status !== HTTP_STATUS.OK
     ) {

@@ -55,6 +55,7 @@
   })
 
   const sortedMyHousework = computed(() => {
+    console.log('changed')
     if (!myHousework.value) return []
 
     return [...myHousework.value].sort((a, b) => {
