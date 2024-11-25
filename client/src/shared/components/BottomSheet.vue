@@ -1,5 +1,8 @@
 <template>
-  <div class="bottom-sheet-overlay-container" @click.stop>
+  <div
+    class="bottom-sheet-overlay-container"
+    @click.stop="handleCloseBottomSheet"
+  >
     <div class="bottom-sheet-overlay"></div>
     <div class="bottom-sheet-container">
       <header>
@@ -257,6 +260,8 @@
   import type { FormProps } from 'ant-design-vue'
   import type { HouseworkFormProps } from '@/modules/housework-calendar/interface/HouseworkCalendarInterface'
   const { handleFinish, handleFinishFailed } = useHouseworkSubmit()
+  import { useMyDailyStore } from '@/modules/my-daily/store/my-daily'
+  const myDailyStore = useMyDailyStore()
 
   const handleSubmitForm: FormProps['onFinish'] = async (
     values: HouseworkFormProps
@@ -280,54 +285,20 @@
   import useHouseworkActions from '../composables/useHouseworkActions'
   const { deleteHousework, completeHousework, setHouseworkOngoing } =
     useHouseworkActions()
-  import { useMyDailyStore } from '@/modules/my-daily/store/my-daily'
-  const myDailyStore = useMyDailyStore()
 
   const handleTaskDelete = async (id: number) => {
-    try {
-      await deleteHousework(id)
-      if (myDailyStore.myHousework) {
-        myDailyStore.myHousework = [
-          ...myDailyStore.myHousework.filter(
-            (housework) => housework.id !== id
-          ),
-        ]
-      }
-      await myDailyStore.refreshMyWorkoutStat()
-      handleCloseBottomSheet()
-    } catch (error) {
-      console.error('Failed to delete housework:', error)
-    }
+    await deleteHousework(id)
+    handleCloseBottomSheet()
   }
 
   const handleTaskComplete = async (id: number) => {
-    try {
-      const response = await completeHousework(id)
-      if (myDailyStore.myHousework) {
-        myDailyStore.myHousework = myDailyStore.myHousework.map((housework) =>
-          housework.id === id ? response : housework
-        )
-      }
-      await myDailyStore.refreshMyWorkoutStat()
-      handleCloseBottomSheet()
-    } catch (error) {
-      console.error('Failed to complete housework:', error)
-    }
+    await completeHousework(id)
+    handleCloseBottomSheet()
   }
 
   const handleTaskOngoing = async (id: number) => {
-    try {
-      const response = await setHouseworkOngoing(id)
-      if (myDailyStore.myHousework) {
-        myDailyStore.myHousework = myDailyStore.myHousework.map((housework) =>
-          housework.id === id ? response : housework
-        )
-      }
-      await myDailyStore.refreshMyWorkoutStat()
-      handleCloseBottomSheet()
-    } catch (error) {
-      console.error('Failed to set housework ongoing:', error)
-    }
+    await setHouseworkOngoing(id)
+    handleCloseBottomSheet()
   }
 </script>
 
