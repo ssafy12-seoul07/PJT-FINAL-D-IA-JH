@@ -18,7 +18,8 @@
         />
       </template>
     </BaseHeader>
-    <h1>houseworks</h1>
+    <WeekSelector/>
+
     <BottomNavBar />
     <BottomSheet v-if="mode === 'open'" @on-close="handleAction" />
   </div>
@@ -32,6 +33,7 @@
   import HeaderTitle from '@/shared/components/HeaderTitle.vue'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import WeekSelector from '@/modules/housework-calendar/components/WeekSelector.vue'
 
   const router = useRouter()
   const handleAction = (action: string) => {

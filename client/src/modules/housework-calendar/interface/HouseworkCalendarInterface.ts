@@ -1,7 +1,7 @@
-export interface WeekSelectorProps {
-  startDate: string
-  endDate: string
-}
+// export interface WeekSelectorProps {
+//   startDate: string
+//   endDate: string
+// }
 
 export interface WeekCalendarProps {
   selectedDate: string
@@ -16,7 +16,7 @@ export interface TaskListInterface {
   name: string
   description: string
   color: string
-  colorieAmount: number
+  calorieAmount: number
   startAt: string | Date // "2024-11-11T00:00:00.000Z" 형식
   dueAt: string | Date
   doneAt?: string | Date // nullable
