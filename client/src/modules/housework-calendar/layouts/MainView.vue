@@ -9,7 +9,7 @@
         <HeaderActionButton
           icon="plus"
           action="addHouseWork"
-          @on-click="handleAction"
+          @on-click="handleAction('open')"
         />
         <HeaderActionButton
           icon="gear"
@@ -20,14 +20,17 @@
     </BaseHeader>
     <h1>houseworks</h1>
     <BottomNavBar />
+    <BottomSheet v-if="mode === 'open'" @on-close="handleAction" />
   </div>
 </template>
 
 <script setup lang="ts">
   import BaseHeader from '@/shared/components/BaseHeader.vue'
-import BottomNavBar from '@/shared/components/BottomNavBar.vue';
+  import BottomNavBar from '@/shared/components/BottomNavBar.vue'
+  import BottomSheet from '@/shared/components/BottomSheet.vue'
   import HeaderActionButton from '@/shared/components/HeaderActionButton.vue'
   import HeaderTitle from '@/shared/components/HeaderTitle.vue'
+  import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 
   const router = useRouter()
@@ -36,11 +39,16 @@ import BottomNavBar from '@/shared/components/BottomNavBar.vue';
       case 'setting':
         router.push({ name: 'Setting' })
         break
-      case 'addHouseWork':
-        console.log('addHouseWork')
+      case 'open':
+        mode.value = 'open'
+        break
+      case 'close':
+        mode.value = 'close'
         break
     }
   }
+
+  const mode = ref<'open' | 'close'>('close')
 </script>
 
 <style scoped></style>

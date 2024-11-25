@@ -2,7 +2,6 @@
   <div class="mobile-container">
     <PhoneHeader class="phone-header" />
     <RouterView />
-    <div class="router-view"></div>
   </div>
 </template>
 
@@ -20,12 +19,14 @@
     border-radius: 24px;
     display: flex;
     flex-direction: column;
+    position: relative;
   }
 
   @media (max-width: 430px) {
     .mobile-container {
       /* mobile phone size */
       width: 100vw;
+      min-width: 360px;
       height: 100vh;
       border-radius: 0;
       box-shadow: none;
