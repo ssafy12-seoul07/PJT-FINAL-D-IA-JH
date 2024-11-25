@@ -58,7 +58,7 @@
   }
   div.color-divider {
     width: 4px;
-    background-color: #5462eb;
+    background-color: var(--task-default);
     border-radius: 2px;
     margin-right: 8px;
   }

@@ -19,7 +19,7 @@
   import ActivityRing from '@/shared/components/ActivityRing.vue'
   import BottomNavBar from '@/shared/components/BottomNavBar.vue'
   import FamilyDailyHeader from '../components/FamilyDailyHeader.vue'
-  import useFormatDate from '../composables/useFormatDate'
+  import useFormatDate from '../composables/useFormatDateKorean'
   const { getTodayFormatted } = useFormatDate()
   const formattedDate = getTodayFormatted()
 

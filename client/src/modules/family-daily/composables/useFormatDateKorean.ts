@@ -1,4 +1,4 @@
-const useFormatDate = () => {
+const useFormatDateKorean = () => {
   const getDayKorean = (day: number) => {
     const days = ['일', '월', '화', '수', '목', '금', '토']
     return days[day]
@@ -21,4 +21,4 @@ const useFormatDate = () => {
   }
 }
 
-export default useFormatDate
+export default useFormatDateKorean

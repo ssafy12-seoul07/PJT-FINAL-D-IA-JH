@@ -18,6 +18,11 @@ export const useUserStore = defineStore('user', () => {
     return userInfo.value
   }
 
+  const getCurrentUserId = async () => {
+    const user = await getUserInfo()
+    return (user as userInfoInterface).id
+  }
+
   const getFamilyInfo = async () => {
     if (!familyInfo.value) {
       const family = await userAPI.getFamilyInfo()
@@ -29,5 +34,5 @@ export const useUserStore = defineStore('user', () => {
     }
     return familyInfo.value
   }
-  return { userInfo, familyInfo, getUserInfo, getFamilyInfo }
+  return { userInfo, familyInfo, getCurrentUserId, getUserInfo, getFamilyInfo }
 })
