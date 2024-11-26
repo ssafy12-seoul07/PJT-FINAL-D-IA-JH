@@ -221,7 +221,7 @@
         Modal.confirm({
           title: '저장된 임시 데이터가 있습니다. 불러오시겠습니까?',
           icon: createVNode(ExclamationCircleOutlined),
-          content: '아니오를 누를 시, 삭제됩니다.',
+          content: '아니오를 선택하면 임시저장된 데이터가 삭제됩니다',
           okText: '네',
           cancelText: '아니오',
           centered: true,
