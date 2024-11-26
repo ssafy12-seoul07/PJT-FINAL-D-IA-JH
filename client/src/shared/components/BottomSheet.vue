@@ -147,7 +147,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, createVNode, onMounted, ref, watch } from 'vue'
   import dayjs from 'dayjs'
   import timezone from 'dayjs/plugin/timezone'
   import utc from 'dayjs/plugin/utc'
@@ -156,6 +156,7 @@
     ScheduleOutlined,
     FireOutlined,
     InfoCircleOutlined,
+    ExclamationCircleOutlined,
   } from '@ant-design/icons-vue'
   import type {
     HouseworkFormModeType,
@@ -190,8 +191,8 @@
 
   const mode = ref<HouseworkFormModeType>(props.name ? 'read' : 'create')
 
-  const formState = ref({
-    id: props.id ?? '',
+  const formState = ref<HouseworkFormStateProps>({
+    id: props.id ?? undefined,
     name: props.name ?? '',
     description: props.description ?? '',
     color: props.color ?? TASK_DEFAULT_COLOR,
@@ -207,6 +208,69 @@
     doneAt: props.doneAt ?? '',
     assignedUserId: props.assignedUserId ?? null,
   })
+
+  const formDraftStore = useFormDraftStore()
+
+  // formState 초기화 전에 draft 확인
+  onMounted(async () => {
+    await userStore.getFamilyInfo()
+
+    if (mode.value === 'create') {
+      const savedDraft = formDraftStore.loadDraft()
+      if (savedDraft) {
+        Modal.confirm({
+          title: '저장된 임시 데이터가 있습니다. 불러오시겠습니까?',
+          icon: createVNode(ExclamationCircleOutlined),
+          content: '아니오를 누를 시, 삭제됩니다.',
+          okText: '네',
+          cancelText: '아니오',
+          centered: true,
+          onOk() {
+            formState.value = {
+              name: savedDraft.name,
+              description: savedDraft.description,
+              color: savedDraft.color,
+              calorieAmount: savedDraft.calorieAmount,
+              timeRange: [
+                savedDraft.timeRange[0]
+                  ? dayjs(savedDraft.timeRange[0]).tz()
+                  : null,
+                savedDraft.timeRange[1]
+                  ? dayjs(savedDraft.timeRange[1]).tz()
+                  : null,
+              ],
+              isAllDay: savedDraft.isAllDay,
+              assignedUserId: savedDraft.assignedUserId,
+              doneAt: '', // 새로 생성하는 경우이므로 빈 문자열
+            }
+          },
+          onCancel() {
+            formDraftStore.clearDraft()
+          },
+        })
+      }
+    }
+  })
+
+  // formState 변경 감지하여 draft 저장
+  watch(
+    () => formState.value,
+    (newVal) => {
+      if (mode.value === 'create') {
+        const draftData: HouseworkFormStateProps = {
+          name: newVal.name,
+          description: newVal.description,
+          color: newVal.color,
+          calorieAmount: newVal.calorieAmount,
+          timeRange: newVal.timeRange,
+          isAllDay: newVal.isAllDay,
+          assignedUserId: newVal.assignedUserId,
+        }
+        formDraftStore.saveDraft(draftData)
+      }
+    },
+    { deep: true }
+  )
 
   const labelCol = { span: 8 }
   const wrapperCol = { span: 24 }
@@ -257,14 +321,18 @@
   )
 
   import { useHouseworkSubmit } from '@/modules/housework-calendar/composables/useHouseworkSubmit'
-  import type { FormProps } from 'ant-design-vue'
-  import type { HouseworkFormProps } from '@/modules/housework-calendar/interface/HouseworkCalendarInterface'
+  import { Modal, type FormProps } from 'ant-design-vue'
+  import type {
+    HouseworkFormProps,
+    HouseworkFormStateProps,
+  } from '@/modules/housework-calendar/interface/HouseworkCalendarInterface'
   const { handleFinish, handleFinishFailed } = useHouseworkSubmit()
   import { useMyDailyStore } from '@/modules/my-daily/store/my-daily'
   const myDailyStore = useMyDailyStore()
   import { useFamilyDailyStore } from '@/modules/family-daily/store/family-daily'
   const familyDailyStore = useFamilyDailyStore()
 
+  // 폼 제출 성공 시 draft 삭제
   const handleSubmitForm: FormProps['onFinish'] = async (
     values: HouseworkFormProps
   ) => {
@@ -272,7 +340,8 @@
       await handleFinish(values, mode.value)
       await myDailyStore.refreshMyWorkoutStat()
       await familyDailyStore.refreshFamilyWorkoutStat()
-      await handleCloseBottomSheet()
+      formDraftStore.clearDraft() // draft 삭제 추가
+      handleCloseBottomSheet()
     } catch (error) {
       console.log(error)
     }
@@ -286,6 +355,7 @@
   }
 
   import useHouseworkActions from '../composables/useHouseworkActions'
+  import { useFormDraftStore } from '@/modules/housework-calendar/store/draft'
   const { deleteHousework, completeHousework, setHouseworkOngoing } =
     useHouseworkActions()
 

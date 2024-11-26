@@ -30,11 +30,13 @@
   import { useFamilyDailyStore } from '@/modules/family-daily/store/family-daily'
   import { useHouseworkStore } from '@/modules/housework-calendar/store/houseworks'
   import { useUserStore } from '@/modules/authentication/store/user'
+  import { useFormDraftStore } from '@/modules/housework-calendar/store/draft'
 
   const { resetFamilyWorkoutStat } = useFamilyDailyStore()
   const { resetHousework } = useHouseworkStore()
   const { resetMyDaily } = useMyDailyStore()
   const { resetUserStore } = useUserStore()
+  const { clearDraft } = useFormDraftStore()
 
   const router = useRouter()
   const handleAction = (action: string) => {
@@ -51,6 +53,7 @@
     resetHousework()
     resetMyDaily()
     resetUserStore()
+    clearDraft()
     router.push({ name: 'Login' })
   }
 </script>
