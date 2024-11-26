@@ -38,8 +38,8 @@
           calculateProgressPercentage(doneHouseworkCnt, totalHouseworkCnt)
         "
         :key="calculateProgressPercentage(doneHouseworkCnt, totalHouseworkCnt)"
-        :top="7.5"
-        :left="6.5"
+        :top="7"
+        :left="7"
       />
     </div>
   </div>

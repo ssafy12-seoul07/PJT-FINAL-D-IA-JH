@@ -52,9 +52,10 @@
 
   const circumference = computed(() => 2 * Math.PI * 16)
   const initialDashOffset = ref(circumference.value)
-  const dashOffset = computed(
-    () => circumference.value * (1 - props.progress / 100)
-  )
+  const dashOffset = computed(() => {
+    const progress = props.progress > 100 ? 100 : props.progress
+    return circumference.value * (1 - progress / 100)
+  })
 
   const wrapperStyle = computed(() => ({
     width: `${props.width}px`,
