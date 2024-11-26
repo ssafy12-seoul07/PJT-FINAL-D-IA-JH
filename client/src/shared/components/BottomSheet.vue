@@ -1,9 +1,6 @@
 <template>
-  <div
-    class="bottom-sheet-overlay-container"
-    @click.stop="handleCloseBottomSheet"
-  >
-    <div class="bottom-sheet-overlay"></div>
+  <div class="bottom-sheet-overlay-container">
+    <div class="bottom-sheet-overlay" @click="handleCloseBottomSheet"></div>
     <div class="bottom-sheet-container">
       <header>
         <button @click="handleCloseBottomSheet">
@@ -262,6 +259,8 @@
   const { handleFinish, handleFinishFailed } = useHouseworkSubmit()
   import { useMyDailyStore } from '@/modules/my-daily/store/my-daily'
   const myDailyStore = useMyDailyStore()
+  import { useFamilyDailyStore } from '@/modules/family-daily/store/family-daily'
+  const familyDailyStore = useFamilyDailyStore()
 
   const handleSubmitForm: FormProps['onFinish'] = async (
     values: HouseworkFormProps
@@ -269,7 +268,8 @@
     try {
       await handleFinish(values, mode.value)
       await myDailyStore.refreshMyWorkoutStat()
-      handleCloseBottomSheet()
+      await familyDailyStore.refreshFamilyWorkoutStat()
+      await handleCloseBottomSheet()
     } catch (error) {
       console.log(error)
     }

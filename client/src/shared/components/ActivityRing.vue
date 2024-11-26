@@ -19,7 +19,28 @@
         ><span>{{ doneHouseworkCnt }}/{{ totalHouseworkCnt }}개</span>
       </div>
     </div>
-    <div class="ring-container">Ring</div>
+    <div class="ring-container">
+      <CircleProgressComponent
+        :width="84"
+        :height="84"
+        :color="RING_COLOR['red']"
+        text=""
+        :active="false"
+        backgroundColor="none"
+        :progress="calculateProgressPercentage(burnedKcal, goalKcal)"
+      />
+      <CircleProgressComponent
+        :width="71"
+        :height="71"
+        color="#4CAF50"
+        backgroundColor="none"
+        text=""
+        :active="false"
+        :progress="75"
+        :top="6.5"
+        :left="6.5"
+      />
+    </div>
   </div>
 </template>
 
@@ -30,6 +51,9 @@
   import type { familyListInteface } from '@/modules/authentication/interface/UserInfomationInterface'
   import ProfileContainer from './ProfileContainer.vue'
   import usePercentageCalculator from '../composables/usePercentageCalculator'
+  import CircleProgressComponent from './CircleProgressComponent.vue'
+  import { RING_COLOR } from '../constants/HouseworkConstants'
+
   const userStore = useUserStore()
   const props = defineProps<workoutStatInterface>()
   const calculatePercentage = usePercentageCalculator
@@ -44,6 +68,15 @@
         (el: familyListInteface) => el.id === props.userId
       ) || null
   )
+
+  const calculateProgressPercentage = (
+    value: number,
+    maxValue: number
+  ): number => {
+    return 100
+    if (maxValue === 0) return 0
+    return (value / maxValue) * 100
+  }
 </script>
 
 <style scoped>
@@ -54,7 +87,6 @@
     margin-bottom: 8px;
     display: flex;
     padding: 16px;
-    gap: 42px;
     justify-content: space-between;
   }
 
@@ -101,6 +133,6 @@
   div.ring-container {
     width: 84px;
     height: 84px;
-    background-color: aqua;
+    position: relative;
   }
 </style>
