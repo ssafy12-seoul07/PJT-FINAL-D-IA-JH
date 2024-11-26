@@ -1,6 +1,6 @@
 <template>
-  <div class="bottom-sheet-overlay-container" @click.stop>
-    <div class="bottom-sheet-overlay"></div>
+  <div class="bottom-sheet-overlay-container">
+    <div class="bottom-sheet-overlay" @click="handleCloseBottomSheet"></div>
     <div class="bottom-sheet-container">
       <header>
         <button @click="handleCloseBottomSheet">
@@ -26,6 +26,9 @@
           @finish="handleSubmitForm"
           @finishFailed="handleFinishFailed"
         >
+          <a-form-item name="id" hidden>
+            <a-input v-model:value="formState.id" />
+          </a-form-item>
           <a-form-item name="name">
             <a-input v-model:value="formState.name" placeholder="집안일 제목">
               <template #prefix
@@ -122,23 +125,29 @@
               </template>
             </a-input>
           </a-form-item>
-          <div class="button-container" v-if="mode === 'read'">
-            <a-form-item>
-              <a-button danger type="primary">삭제</a-button>
-            </a-form-item>
-            <a-form-item>
-              <a-button v-if="formState.doneAt">미완료</a-button>
-              <a-button v-else type="primary">완료</a-button>
-            </a-form-item>
-          </div>
         </a-form>
+        <div class="button-container" v-if="mode === 'read' && id">
+          <a-form-item>
+            <a-button danger type="primary" @click="handleTaskDelete(id)"
+              >삭제</a-button
+            >
+          </a-form-item>
+          <a-form-item>
+            <a-button v-if="formState.doneAt" @click="handleTaskOngoing(id)"
+              >미완료</a-button
+            >
+            <a-button v-else type="primary" @click="handleTaskComplete(id)"
+              >완료</a-button
+            >
+          </a-form-item>
+        </div>
       </main>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, createVNode, onMounted, ref, watch } from 'vue'
   import dayjs from 'dayjs'
   import timezone from 'dayjs/plugin/timezone'
   import utc from 'dayjs/plugin/utc'
@@ -147,8 +156,12 @@
     ScheduleOutlined,
     FireOutlined,
     InfoCircleOutlined,
+    ExclamationCircleOutlined,
   } from '@ant-design/icons-vue'
-  import type { HouseworkInterface } from '../interface/HouseworkInterface'
+  import type {
+    HouseworkFormModeType,
+    HouseworkInterface,
+  } from '../interface/HouseworkInterface'
   import useIsFullDay from '../composables/useIsFullDay'
   import { useUserStore } from '@/modules/authentication/store/user'
   import { TASK_DEFAULT_COLOR } from '../constants/HouseworkConstants'
@@ -160,10 +173,13 @@
   })
   const familyList = computed(() => userStore.familyInfo?.members || null)
 
+  import defaultImg from '@/assets/images/defaultImg.jpg'
+
   const getProfileImagePath = (profileImageName: string | null) => {
-    if (!profileImageName)
-      return new URL(`@/assets/images/defaultImg.jpg`, import.meta.url).href
-    return new URL(`@/assets/images/${profileImageName}`, import.meta.url).href
+    if (!profileImageName) return defaultImg
+    // 동적 import를 위해 다음과 같이 사용
+    return new URL(`/src/assets/images/${profileImageName}`, import.meta.url)
+      .href
   }
 
   dayjs.extend(utc)
@@ -173,10 +189,11 @@
 
   const props = defineProps<Partial<HouseworkInterface>>()
 
-  const mode = ref<'create' | 'read' | 'edit'>(props.name ? 'read' : 'create')
+  const mode = ref<HouseworkFormModeType>(props.name ? 'read' : 'create')
 
-  const formState = ref({
-    name: props.name || '',
+  const formState = ref<HouseworkFormStateProps>({
+    id: props.id ?? undefined,
+    name: props.name ?? '',
     description: props.description ?? '',
     color: props.color ?? TASK_DEFAULT_COLOR,
     calorieAmount: props.calorieAmount ?? '',
@@ -192,6 +209,69 @@
     assignedUserId: props.assignedUserId ?? null,
   })
 
+  const formDraftStore = useFormDraftStore()
+
+  // formState 초기화 전에 draft 확인
+  onMounted(async () => {
+    await userStore.getFamilyInfo()
+
+    if (mode.value === 'create') {
+      const savedDraft = formDraftStore.loadDraft()
+      if (savedDraft) {
+        Modal.confirm({
+          title: '저장된 임시 데이터가 있습니다. 불러오시겠습니까?',
+          icon: createVNode(ExclamationCircleOutlined),
+          content: '아니오를 선택하면 임시저장된 데이터가 삭제됩니다',
+          okText: '네',
+          cancelText: '아니오',
+          centered: true,
+          onOk() {
+            formState.value = {
+              name: savedDraft.name,
+              description: savedDraft.description,
+              color: savedDraft.color,
+              calorieAmount: savedDraft.calorieAmount,
+              timeRange: [
+                savedDraft.timeRange[0]
+                  ? dayjs(savedDraft.timeRange[0]).tz()
+                  : null,
+                savedDraft.timeRange[1]
+                  ? dayjs(savedDraft.timeRange[1]).tz()
+                  : null,
+              ],
+              isAllDay: savedDraft.isAllDay,
+              assignedUserId: savedDraft.assignedUserId,
+              doneAt: '', // 새로 생성하는 경우이므로 빈 문자열
+            }
+          },
+          onCancel() {
+            formDraftStore.clearDraft()
+          },
+        })
+      }
+    }
+  })
+
+  // formState 변경 감지하여 draft 저장
+  watch(
+    () => formState.value,
+    (newVal) => {
+      if (mode.value === 'create') {
+        const draftData: HouseworkFormStateProps = {
+          name: newVal.name,
+          description: newVal.description,
+          color: newVal.color,
+          calorieAmount: newVal.calorieAmount,
+          timeRange: newVal.timeRange,
+          isAllDay: newVal.isAllDay,
+          assignedUserId: newVal.assignedUserId,
+        }
+        formDraftStore.saveDraft(draftData)
+      }
+    },
+    { deep: true }
+  )
+
   const labelCol = { span: 8 }
   const wrapperCol = { span: 24 }
 
@@ -201,26 +281,8 @@
     emit('onClose', 'close')
   }
 
-  const handleEditForm = async () => {
-    mode.value = 'read'
-  }
-
-  import { useHouseworkSubmit } from '@/modules/housework-calendar/composables/useHouseworkSubmit'
-  import type { FormProps } from 'ant-design-vue'
-  const { handleFinish, handleFinishFailed } = useHouseworkSubmit()
-
-  const handleSubmitForm: FormProps['onFinish'] = async (values) => {
-    try {
-      await handleFinish(values)
-      handleCloseBottomSheet()
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const triggerFormSubmit = async () => {
-    const values = await formRef.value?.validateFields()
-    handleSubmitForm(values)
+  const handleEditForm = () => {
+    mode.value = 'edit'
   }
 
   const rules = {
@@ -257,6 +319,60 @@
       formRef.value?.validateFields(['timeRange'])
     }
   )
+
+  import { useHouseworkSubmit } from '@/modules/housework-calendar/composables/useHouseworkSubmit'
+  import { Modal, type FormProps } from 'ant-design-vue'
+  import type {
+    HouseworkFormProps,
+    HouseworkFormStateProps,
+  } from '@/modules/housework-calendar/interface/HouseworkCalendarInterface'
+  const { handleFinish, handleFinishFailed } = useHouseworkSubmit()
+  import { useMyDailyStore } from '@/modules/my-daily/store/my-daily'
+  const myDailyStore = useMyDailyStore()
+  import { useFamilyDailyStore } from '@/modules/family-daily/store/family-daily'
+  const familyDailyStore = useFamilyDailyStore()
+
+  // 폼 제출 성공 시 draft 삭제
+  const handleSubmitForm: FormProps['onFinish'] = async (
+    values: HouseworkFormProps
+  ) => {
+    try {
+      await handleFinish(values, mode.value)
+      await myDailyStore.refreshMyWorkoutStat()
+      await familyDailyStore.refreshFamilyWorkoutStat()
+      formDraftStore.clearDraft() // draft 삭제 추가
+      handleCloseBottomSheet()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const triggerFormSubmit = async () => {
+    const values = await formRef.value?.validateFields()
+    if (values) {
+      handleSubmitForm(values)
+    }
+  }
+
+  import useHouseworkActions from '../composables/useHouseworkActions'
+  import { useFormDraftStore } from '@/modules/housework-calendar/store/draft'
+  const { deleteHousework, completeHousework, setHouseworkOngoing } =
+    useHouseworkActions()
+
+  const handleTaskDelete = async (id: number) => {
+    await deleteHousework(id)
+    handleCloseBottomSheet()
+  }
+
+  const handleTaskComplete = async (id: number) => {
+    await completeHousework(id)
+    handleCloseBottomSheet()
+  }
+
+  const handleTaskOngoing = async (id: number) => {
+    await setHouseworkOngoing(id)
+    handleCloseBottomSheet()
+  }
 </script>
 
 <style scoped>

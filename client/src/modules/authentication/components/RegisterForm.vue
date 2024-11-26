@@ -23,19 +23,22 @@
       </a-form-item>
 
       <a-form-item ref="familyId" label="가족ID" name="familyId">
-        <a-input
+        <a-input-number
           v-model:value="formState.familyId"
           :disabled="formState.noFamily"
-          type="number"
         />
         <a-form-item-rest>
-          <a-checkbox v-model:checked="formState.noFamily">1인가구</a-checkbox>
+          <a-checkbox
+            v-model:checked="formState.noFamily"
+            style="margin-left: 8px"
+            >1인가구</a-checkbox
+          >
         </a-form-item-rest>
       </a-form-item>
 
-      <a-form-item label="목표칼로리" name="goalKcal">
+      <a-form-item label="목표칼로리" name="calorieGoal">
         <a-input-number
-          v-model:value="formState.goalKcal"
+          v-model:value="formState.calorieGoal"
           type="number"
           min="0"
           max="2147483647"
@@ -82,7 +85,7 @@
     email: '',
     password: '',
     familyId: null,
-    goalKcal: 0,
+    calorieGoal: 0,
     profileImageName: '',
     noFamily: false,
   })
@@ -168,7 +171,7 @@
         trigger: ['change', 'blur'],
       },
     ],
-    goalKcal: [
+    calorieGoal: [
       {
         required: true,
         message: '하루에 소모하고 싶은 목표칼로리를 적어주세요',

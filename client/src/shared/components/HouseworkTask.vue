@@ -1,45 +1,48 @@
 <template>
-  <div class="housework-task-container" @click="handleCardClick('open')">
-    <div class="color-divider"></div>
+  <div
+    class="housework-task-container"
+    @click="handleCardClick('open')"
+    :class="{ completed: isCompleted }"
+  >
+    <div class="color-divider" :style="dividerStyle"></div>
     <div class="task-container">
       <div>[{{ name }}] {{ description }}</div>
       <div>{{ startTime }} ~ {{ dueTime }}</div>
     </div>
     <div class="profile-container">
-      <ProfileImg :profileImageName="null" />
+      <ProfileContainer :userId="assignedUserId" />
     </div>
     <BottomSheet
       v-if="mode === 'open'"
       v-bind="props"
       @on-close="handleCardClick"
+      @click.stop
     />
   </div>
 </template>
 
 <script setup lang="ts">
   import type { HouseworkInterface } from '../interface/HouseworkInterface'
-  import ProfileImg from './ProfileImg.vue'
   import useTimeToString from '../composables/useTimeToString'
   import { computed, ref } from 'vue'
   import BottomSheet from './BottomSheet.vue'
+  import ProfileContainer from './ProfileContainer.vue'
   const props = defineProps<HouseworkInterface>()
 
   const startTime = computed(() => useTimeToString(props.startAt))
   const dueTime = computed(() => useTimeToString(props.dueAt))
+  const isCompleted = computed(() => props.doneAt !== null)
 
   const mode = ref<'open' | 'close'>('close')
 
-  const handleCardClick = (action: string) => {
+  const handleCardClick = (action: 'open' | 'close') => {
     console.log(action)
-    switch (action) {
-      case 'open':
-        mode.value = 'open'
-        break
-      case 'close':
-        mode.value = 'close'
-        break
-    }
+    mode.value = action
   }
+
+  const dividerStyle = computed(() => ({
+    backgroundColor: props.color || 'var(--task-default)',
+  }))
 </script>
 
 <style scoped>
@@ -75,5 +78,14 @@
   div.profile-container {
     display: flex;
     align-items: flex-end;
+  }
+  div.completed {
+    background-color: #f6f6f6;
+    > div.task-container {
+      > div {
+        color: #757575;
+        text-decoration: line-through;
+      }
+    }
   }
 </style>

@@ -2,11 +2,7 @@
   <div class="activity-ring-container">
     <div class="activity-container">
       <div>
-        <ProfileContainer
-          :key="userInfo?.id"
-          :name="userInfo?.name"
-          :profileImageName="userInfo?.profileImageName"
-        />
+        <ProfileContainer :key="userId" :userId="userId" />
       </div>
       <div class="stat-row workout">
         <span>운동하기</span
@@ -15,35 +11,57 @@
       </div>
       <div class="stat-row housework">
         <span>집안일하기</span
-        ><span>{{ calculatePercentage(burnedKcal, goalKcal) }}%</span
+        ><span
+          >{{ calculatePercentage(doneHouseworkCnt, totalHouseworkCnt) }}%</span
         ><span>{{ doneHouseworkCnt }}/{{ totalHouseworkCnt }}개</span>
       </div>
     </div>
-    <div class="ring-container">Ring</div>
+    <div class="ring-container">
+      <CircleProgressComponent
+        :width="84"
+        :height="84"
+        :color="RING_COLOR['red']"
+        text=""
+        :active="false"
+        backgroundColor="none"
+        :progress="calculateProgressPercentage(burnedKcal, goalKcal)"
+        :key="calculateProgressPercentage(burnedKcal, goalKcal)"
+      />
+      <CircleProgressComponent
+        :width="70"
+        :height="70"
+        :color="RING_COLOR['green']"
+        backgroundColor="none"
+        text=""
+        :active="false"
+        :progress="
+          calculateProgressPercentage(doneHouseworkCnt, totalHouseworkCnt)
+        "
+        :key="calculateProgressPercentage(doneHouseworkCnt, totalHouseworkCnt)"
+        :top="7"
+        :left="7"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted } from 'vue'
   import type { workoutStatInterface } from '../interface/WorkoutStatInterface'
-  import { useUserStore } from '@/modules/authentication/store/user'
-  import type { familyListInteface } from '@/modules/authentication/interface/UserInfomationInterface'
   import ProfileContainer from './ProfileContainer.vue'
   import usePercentageCalculator from '../composables/usePercentageCalculator'
-  const userStore = useUserStore()
-  const props = defineProps<workoutStatInterface>()
+  import CircleProgressComponent from './CircleProgressComponent.vue'
+  import { RING_COLOR } from '../constants/HouseworkConstants'
+
+  defineProps<workoutStatInterface>()
   const calculatePercentage = usePercentageCalculator
 
-  onMounted(async () => {
-    await userStore.getFamilyInfo()
-  })
-
-  const userInfo = computed(
-    () =>
-      userStore.familyInfo?.members.find(
-        (el: familyListInteface) => el.id === props.userId
-      ) || null
-  )
+  const calculateProgressPercentage = (
+    value: number,
+    maxValue: number
+  ): number => {
+    if (maxValue === 0 || value === 0) return 1
+    return (value / maxValue) * 100
+  }
 </script>
 
 <style scoped>
@@ -54,7 +72,6 @@
     margin-bottom: 8px;
     display: flex;
     padding: 16px;
-    gap: 42px;
     justify-content: space-between;
   }
 
@@ -101,6 +118,6 @@
   div.ring-container {
     width: 84px;
     height: 84px;
-    background-color: aqua;
+    position: relative;
   }
 </style>

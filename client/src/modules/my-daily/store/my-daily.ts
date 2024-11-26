@@ -15,11 +15,33 @@ export const useMyDailyStore = defineStore('my-daily', () => {
     }
   }
 
+  const refreshMyWorkoutStat = async () => {
+    try {
+      myWorkoutStat.value = await useMyDaily.getMyWorkoutStat()
+      console.log('my refreshed')
+    } catch (error) {
+      console.error('Failed to refresh workout stat:', error)
+      throw error
+    }
+  }
+
   const getMyHousework = async (from: Date, to: Date, userId?: number) => {
     if (!myHousework.value) {
       myHousework.value = await useMyDaily.getMyHousework(from, to, userId)
     }
   }
 
-  return { myWorkoutStat, myHousework, getMyWorkoutStat, getMyHousework }
+  const resetMyDaily = () => {
+    myWorkoutStat.value = null
+    myHousework.value = null
+  }
+
+  return {
+    myWorkoutStat,
+    myHousework,
+    getMyWorkoutStat,
+    refreshMyWorkoutStat,
+    getMyHousework,
+    resetMyDaily,
+  }
 })
