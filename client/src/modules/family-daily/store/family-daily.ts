@@ -14,5 +14,15 @@ export const useFamilyDailyStore = defineStore('family-daily', () => {
     return familyWorkoutStat.value
   }
 
-  return { familyWorkoutStat, getFamilyWorkoutStat }
+  const refreshFamilyWorkoutStat = async () => {
+    try {
+      familyWorkoutStat.value = await useFamilyDaily.getFamilyWorkoutStat()
+      console.log('family refreshed')
+    } catch (error) {
+      console.error('Failed to refresh workout stat:', error)
+      throw error
+    }
+  }
+
+  return { familyWorkoutStat, getFamilyWorkoutStat, refreshFamilyWorkoutStat }
 })

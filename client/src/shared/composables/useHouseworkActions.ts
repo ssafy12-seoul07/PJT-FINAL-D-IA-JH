@@ -1,10 +1,12 @@
 import { useHouseworkAPI } from '@/modules/housework-calendar/service/HouseworkAPI'
 import { message } from 'ant-design-vue'
 import { useMyDailyStore } from '@/modules/my-daily/store/my-daily'
+import { useFamilyDailyStore } from '@/modules/family-daily/store/family-daily'
 
 const useHouseworkActions = () => {
   const houseworkAPI = useHouseworkAPI()
   const myDailyStore = useMyDailyStore()
+  const familyDailyStore = useFamilyDailyStore()
 
   const deleteHousework = async (id: number) => {
     try {
@@ -17,6 +19,7 @@ const useHouseworkActions = () => {
         ]
       }
       await myDailyStore.refreshMyWorkoutStat()
+      await familyDailyStore.refreshFamilyWorkoutStat()
       message.success(`선택한 집안일이 삭제되었습니다`)
     } catch (error) {
       console.error('Failed to delete housework:', error)
@@ -31,6 +34,7 @@ const useHouseworkActions = () => {
         )
       }
       await myDailyStore.refreshMyWorkoutStat()
+      await familyDailyStore.refreshFamilyWorkoutStat()
       message.success(`집안일이 완료되었습니다`)
       return response
     } catch (error) {
@@ -46,6 +50,7 @@ const useHouseworkActions = () => {
         )
       }
       await myDailyStore.refreshMyWorkoutStat()
+      await familyDailyStore.refreshFamilyWorkoutStat()
       message.success(`집안일이 미완료로 변경되었습니다`)
 
       return response

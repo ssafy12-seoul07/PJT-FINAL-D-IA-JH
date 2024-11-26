@@ -18,7 +18,7 @@ export const useMyDailyStore = defineStore('my-daily', () => {
   const refreshMyWorkoutStat = async () => {
     try {
       myWorkoutStat.value = await useMyDaily.getMyWorkoutStat()
-      console.log('refreshed')
+      console.log('my refreshed')
     } catch (error) {
       console.error('Failed to refresh workout stat:', error)
       throw error
