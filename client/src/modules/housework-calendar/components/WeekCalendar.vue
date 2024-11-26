@@ -13,13 +13,26 @@
       @click="handleSelectDate(date.date)"
     >
       <span>{{ getDayOfWeek(date.date) }}</span>
-      <span>{{ getDayOfMonth(date.date) }}</span>
-      {{ date.doneCnt }}/{{ date.totalCnt }}
+      <span
+        >{{ getDayOfMonth(date.date) }}
+        <CircleProgressComponent
+          :width="31"
+          :height="31"
+          color="#4CAF50"
+          backgroundColor="none"
+          text=""
+          :active="false"
+          :progress="calculateProgressPercentage(date.doneCnt, date.totalCnt)"
+          :top="-8"
+          :left="-5"
+        />
+      </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+  import CircleProgressComponent from '@/shared/components/CircleProgressComponent.vue'
   import type { WeekCalendarProps } from '../interface/HouseworkCalendarInterface'
   import dayjs from 'dayjs'
 
@@ -59,6 +72,14 @@
       emit('selectDate', dateStr)
     }
   }
+
+  const calculateProgressPercentage = (
+    value: number,
+    maxValue: number
+  ): number => {
+    if (maxValue === 0) return 0
+    return (value / maxValue) * 100
+  }
 </script>
 
 <style scoped>
@@ -84,6 +105,7 @@
       background-color: var(--background-color);
       padding: 8px 16px;
       border-radius: 8px;
+
       &:hover {
         cursor: pointer;
         filter: brightness(95%);
@@ -92,6 +114,11 @@
         font-weight: bold;
         &:first-child {
           margin-bottom: 12px;
+        }
+        &:nth-child(2) {
+          width: 20px;
+          text-align: center;
+          position: relative;
         }
       }
     }
