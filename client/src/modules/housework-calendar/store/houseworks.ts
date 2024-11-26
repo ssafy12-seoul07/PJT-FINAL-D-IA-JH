@@ -1,10 +1,10 @@
-// composables/useHousework.ts
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import dayjs from 'dayjs'
 import type { HouseworkInterface } from '@/shared/interface/HouseworkInterface'
 import { useHouseworkAPI } from '../service/HouseworkAPI'
 
-export function useHouseworkStore() {
+export const useHouseworkStore = defineStore('housework', () => {
   const getMonday = (date: dayjs.Dayjs) => {
     const day = date.day()
     return day === 0 ? date.subtract(6, 'day') : date.subtract(day - 1, 'day')
@@ -60,4 +60,4 @@ export function useHouseworkStore() {
     changeWeek,
     selectDate,
   }
-}
+})

@@ -1,23 +1,29 @@
 <template>
   <div class="profile-container">
-    <Profile :profileImageName="profileImageName" />
-    <span>{{ name }}</span>
+    <Profile :profileImageName="user?.profileImageName" />
+    <span>{{ user?.name }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
+  import { computed, onMounted } from 'vue'
   import Profile from './ProfileImg.vue'
 
-  defineProps({
-    name: {
-      type: [String, null],
-      default: null,
-    },
-    profileImageName: {
-      type: [String, null],
-      default: null,
-    },
+  const props = defineProps<{ userId: number }>()
+
+  import { useUserStore } from '@/modules/authentication/store/user'
+  import type { familyListInteface } from '@/modules/authentication/interface/UserInfomationInterface'
+  const userStore = useUserStore()
+  onMounted(async () => {
+    await userStore.getFamilyInfo()
   })
+
+  const user = computed(
+    () =>
+      userStore.familyInfo?.members.find(
+        (el: familyListInteface) => el.id === props.userId
+      ) || null
+  )
 </script>
 
 <style scoped>
@@ -27,6 +33,7 @@
     span {
       font-size: 12px;
       margin-left: 8px;
+      text-decoration: none !important;
     }
   }
 </style>

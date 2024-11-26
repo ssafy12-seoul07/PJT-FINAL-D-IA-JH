@@ -2,11 +2,7 @@
   <div class="activity-ring-container">
     <div class="activity-container">
       <div>
-        <ProfileContainer
-          :key="userInfo?.id"
-          :name="userInfo?.name"
-          :profileImageName="userInfo?.profileImageName"
-        />
+        <ProfileContainer :key="userId" :userId="userId" />
       </div>
       <div class="stat-row workout">
         <span>운동하기</span
@@ -50,29 +46,14 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted } from 'vue'
   import type { workoutStatInterface } from '../interface/WorkoutStatInterface'
-  import { useUserStore } from '@/modules/authentication/store/user'
-  import type { familyListInteface } from '@/modules/authentication/interface/UserInfomationInterface'
   import ProfileContainer from './ProfileContainer.vue'
   import usePercentageCalculator from '../composables/usePercentageCalculator'
   import CircleProgressComponent from './CircleProgressComponent.vue'
   import { RING_COLOR } from '../constants/HouseworkConstants'
 
-  const userStore = useUserStore()
-  const props = defineProps<workoutStatInterface>()
+  defineProps<workoutStatInterface>()
   const calculatePercentage = usePercentageCalculator
-
-  onMounted(async () => {
-    await userStore.getFamilyInfo()
-  })
-
-  const userInfo = computed(
-    () =>
-      userStore.familyInfo?.members.find(
-        (el: familyListInteface) => el.id === props.userId
-      ) || null
-  )
 
   const calculateProgressPercentage = (
     value: number,

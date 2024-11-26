@@ -10,7 +10,7 @@
       <div>{{ startTime }} ~ {{ dueTime }}</div>
     </div>
     <div class="profile-container">
-      <ProfileImg :profileImageName="null" />
+      <ProfileContainer :userId="assignedUserId" />
     </div>
     <BottomSheet
       v-if="mode === 'open'"
@@ -23,10 +23,10 @@
 
 <script setup lang="ts">
   import type { HouseworkInterface } from '../interface/HouseworkInterface'
-  import ProfileImg from './ProfileImg.vue'
   import useTimeToString from '../composables/useTimeToString'
   import { computed, ref } from 'vue'
   import BottomSheet from './BottomSheet.vue'
+  import ProfileContainer from './ProfileContainer.vue'
   const props = defineProps<HouseworkInterface>()
 
   const startTime = computed(() => useTimeToString(props.startAt))
@@ -81,7 +81,11 @@
   }
   div.completed {
     background-color: #f6f6f6;
-    color: #757575;
-    text-decoration: line-through;
+    > div.task-container {
+      > div {
+        color: #757575;
+        text-decoration: line-through;
+      }
+    }
   }
 </style>

@@ -4,7 +4,10 @@ import { useDateTime } from './useTimeFormat'
 import { useMyDailyStore } from '@/modules/my-daily/store/my-daily'
 import { useUserStore } from '@/modules/authentication/store/user'
 import type { HouseworkFormProps } from '../interface/HouseworkCalendarInterface'
-import type { HouseworkFormModeType } from '@/shared/interface/HouseworkInterface'
+import type {
+  HouseworkFormModeType,
+  HouseworkInterface,
+} from '@/shared/interface/HouseworkInterface'
 import type { MyHouseworkInterface } from '@/modules/my-daily/interface/MyDailyInterface'
 import { useHouseworkStore } from '../store/houseworks'
 const { formatToKrISOString, getStartOfDay, getEndOfDay } = useDateTime()
@@ -21,7 +24,7 @@ export function useHouseworkSubmit() {
     isEdit = false
   ) => {
     await updateMyDailyStore(values, response, isEdit)
-    await updateHouseworkStore(response, isEdit)
+    updateHouseworkStore(response, isEdit)
   }
 
   const updateMyDailyStore = async (
@@ -45,12 +48,8 @@ export function useHouseworkSubmit() {
     response: MyHouseworkInterface,
     isEdit: boolean
   ) => {
-    if (!houseworkStore.weekTaskList.value) return
-    const tasks = [
-      ...(houseworkStore.weekTaskList.value as MyHouseworkInterface[]),
-    ]
-    console.log(houseworkStore.weekTaskList)
-    console.log(tasks)
+    if (!houseworkStore.weekTaskList) return
+    const tasks = [...(houseworkStore.weekTaskList as HouseworkInterface[])]
     if (isEdit) {
       const index = tasks.findIndex((housework) => housework.id === response.id)
       if (index !== -1) {
@@ -61,7 +60,7 @@ export function useHouseworkSubmit() {
     }
 
     // weekTaskList만 업데이트
-    houseworkStore.weekTaskList.value = tasks
+    houseworkStore.weekTaskList = tasks
   }
 
   const updateExistingHousework = (

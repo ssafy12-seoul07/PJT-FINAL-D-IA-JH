@@ -1,13 +1,13 @@
 <template>
   <main>
     <WeekSelector
-      :startDate="houseworkStore.startDate.value"
-      :endDate="houseworkStore.endDate.value"
+      :startDate="houseworkStore.startDate"
+      :endDate="houseworkStore.endDate"
       @change-week="houseworkStore.changeWeek"
     />
     <WeekCalendar
       v-if="calendarList.length"
-      :selectedDate="houseworkStore.selectedDate.value"
+      :selectedDate="houseworkStore.selectedDate"
       :calendarData="calendarList"
       @select-date="houseworkStore.selectDate"
     />
@@ -20,45 +20,55 @@
   import WeekCalendar from './WeekCalendar.vue'
   import HouseworkList from './HouseworkList.vue'
   import { useHouseworkStore } from '../store/houseworks'
-  import { computed, onMounted } from 'vue'
+  import { computed, onMounted, watch } from 'vue'
   import type { HouseworkInterface } from '@/shared/interface/HouseworkInterface'
-  const houseworkStore = useHouseworkStore()
-  const { fetchHouseworkData } = houseworkStore
   import dayjs from 'dayjs'
   import type { CalendarData } from '../interface/HouseworkCalendarInterface'
+
+  const houseworkStore = useHouseworkStore()
+  const { fetchHouseworkData } = houseworkStore
 
   onMounted(async () => {
     await fetchHouseworkData()
   })
 
   const calendarList = computed((): CalendarData[] => {
-    const tasks = houseworkStore.weekTaskList.value
+    const tasks = houseworkStore.weekTaskList
     return createCalendarData(
-      houseworkStore.startDate.value,
-      houseworkStore.endDate.value,
+      houseworkStore.startDate,
+      houseworkStore.endDate,
       groupTasksByDate(tasks)
     )
   })
 
   const selectedDateTaskList = computed(() => {
-    const tasks = houseworkStore.weekTaskList.value
+    const tasks = houseworkStore.weekTaskList
     const groupedTasks = groupTasksByDate(tasks)
-    const selectedDateStr = houseworkStore.selectedDate.value
-
+    const selectedDateStr = houseworkStore.selectedDate
     return groupedTasks[selectedDateStr] || []
   })
 
+  watch(
+    () => houseworkStore.weekTaskList,
+    () => {
+      // computed 속성들이 자동으로 재계산됨
+    },
+    { deep: true, immediate: true }
+  )
+
   function groupTasksByDate(tasks: HouseworkInterface[]) {
-    return tasks.reduce(
-      (acc, task) => {
-        const date = dayjs(task.startAt).format('YYYY-MM-DD')
-        if (!acc[date]) {
-          acc[date] = []
-        }
-        acc[date].push(task)
-        return acc
-      },
-      {} as { [key: string]: HouseworkInterface[] }
+    return (
+      tasks.reduce(
+        (acc, task) => {
+          const date = dayjs(task.startAt).format('YYYY-MM-DD')
+          if (!acc[date]) {
+            acc[date] = []
+          }
+          acc[date].push(task)
+          return acc
+        },
+        {} as { [key: string]: HouseworkInterface[] }
+      ) || {}
     )
   }
 
