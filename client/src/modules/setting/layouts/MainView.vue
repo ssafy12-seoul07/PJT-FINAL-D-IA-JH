@@ -26,6 +26,15 @@
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '@/modules/authentication/store/auth'
   const { deleteAccessToken } = useAuthStore()
+  import { useMyDailyStore } from '@/modules/my-daily/store/my-daily'
+  import { useFamilyDailyStore } from '@/modules/family-daily/store/family-daily'
+  import { useHouseworkStore } from '@/modules/housework-calendar/store/houseworks'
+  import { useUserStore } from '@/modules/authentication/store/user'
+
+  const { resetFamilyWorkoutStat } = useFamilyDailyStore()
+  const { resetHousework } = useHouseworkStore()
+  const { resetMyDaily } = useMyDailyStore()
+  const { resetUserStore } = useUserStore()
 
   const router = useRouter()
   const handleAction = (action: string) => {
@@ -38,6 +47,10 @@
 
   const handleLogout = () => {
     deleteAccessToken()
+    resetFamilyWorkoutStat()
+    resetHousework()
+    resetMyDaily()
+    resetUserStore()
     router.push({ name: 'Login' })
   }
 </script>

@@ -24,5 +24,14 @@ export const useFamilyDailyStore = defineStore('family-daily', () => {
     }
   }
 
-  return { familyWorkoutStat, getFamilyWorkoutStat, refreshFamilyWorkoutStat }
+  const resetFamilyWorkoutStat = () => {
+    familyWorkoutStat.value = null
+  }
+
+  return {
+    familyWorkoutStat,
+    getFamilyWorkoutStat,
+    refreshFamilyWorkoutStat,
+    resetFamilyWorkoutStat,
+  }
 })

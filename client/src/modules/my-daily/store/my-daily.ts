@@ -31,11 +31,17 @@ export const useMyDailyStore = defineStore('my-daily', () => {
     }
   }
 
+  const resetMyDaily = () => {
+    myWorkoutStat.value = null
+    myHousework.value = null
+  }
+
   return {
     myWorkoutStat,
     myHousework,
     getMyWorkoutStat,
     refreshMyWorkoutStat,
     getMyHousework,
+    resetMyDaily,
   }
 })

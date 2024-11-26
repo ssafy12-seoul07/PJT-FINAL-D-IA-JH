@@ -34,5 +34,17 @@ export const useUserStore = defineStore('user', () => {
     }
     return familyInfo.value
   }
-  return { userInfo, familyInfo, getCurrentUserId, getUserInfo, getFamilyInfo }
+
+  const resetUserStore = () => {
+    userInfo.value = null
+    familyInfo.value = null
+  }
+  return {
+    userInfo,
+    familyInfo,
+    getCurrentUserId,
+    getUserInfo,
+    getFamilyInfo,
+    resetUserStore,
+  }
 })

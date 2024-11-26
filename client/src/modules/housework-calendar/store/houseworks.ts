@@ -51,6 +51,14 @@ export const useHouseworkStore = defineStore('housework', () => {
     selectedDate.value = dateStr
   }
 
+  const resetHousework = () => {
+    const newCurrentMonday = getMonday(dayjs())
+    startDate.value = newCurrentMonday.format('YYYY-MM-DD')
+    endDate.value = newCurrentMonday.add(6, 'day').format('YYYY-MM-DD')
+    weekTaskList.value = []
+    selectedDate.value = dayjs().format('YYYY-MM-DD')
+  }
+
   return {
     startDate,
     endDate,
@@ -59,5 +67,6 @@ export const useHouseworkStore = defineStore('housework', () => {
     fetchHouseworkData,
     changeWeek,
     selectDate,
+    resetHousework,
   }
 })
