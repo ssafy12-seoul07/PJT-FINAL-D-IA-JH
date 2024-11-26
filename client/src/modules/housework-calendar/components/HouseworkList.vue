@@ -33,12 +33,15 @@
         </a-select-option>
       </a-select>
     </div>
-    <div class="list-container">
+    <div class="list-container" v-if="sortedMyHousework.length">
       <HouseworkTask
         v-for="task in sortedMyHousework"
         :key="task.id"
         v-bind="task"
       />
+    </div>
+    <div v-else class="list-container">
+      <h3>표시할 일정이 없습니다</h3>
     </div>
   </div>
 </template>
@@ -116,6 +119,7 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
+      border-top: 2px solid #f0f0f0;
     }
     div.list-container {
       padding: 8px 16px;
@@ -124,9 +128,13 @@
       -ms-overflow-style: none; /* IE, Edge */
       scrollbar-width: none; /* Firefox */
 
-      height: 579px; /* 가로가 430 이상일때 */
+      height: 578px; /* 가로가 430 이상일때 */
       @media (max-width: 430px) {
         height: calc(100vh - 306px); /* 가로가 430 이하일때 */
+      }
+
+      h3 {
+        text-align: center;
       }
     }
   }

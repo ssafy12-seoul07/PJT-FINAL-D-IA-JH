@@ -23,13 +23,16 @@
       </a-form-item>
 
       <a-form-item ref="familyId" label="가족ID" name="familyId">
-        <a-input
+        <a-input-number
           v-model:value="formState.familyId"
           :disabled="formState.noFamily"
-          type="number"
         />
         <a-form-item-rest>
-          <a-checkbox v-model:checked="formState.noFamily">1인가구</a-checkbox>
+          <a-checkbox
+            v-model:checked="formState.noFamily"
+            style="margin-left: 8px"
+            >1인가구</a-checkbox
+          >
         </a-form-item-rest>
       </a-form-item>
 

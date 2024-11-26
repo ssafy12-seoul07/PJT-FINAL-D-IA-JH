@@ -8,7 +8,6 @@ import type { HouseworkFormModeType } from '@/shared/interface/HouseworkInterfac
 import type { MyHouseworkInterface } from '@/modules/my-daily/interface/MyDailyInterface'
 import { useHouseworkStore } from '../store/houseworks'
 const { formatToKrISOString, getStartOfDay, getEndOfDay } = useDateTime()
-import dayjs from 'dayjs'
 
 export function useHouseworkSubmit() {
   const houseworkAPI = useHouseworkAPI()
@@ -22,7 +21,7 @@ export function useHouseworkSubmit() {
     isEdit = false
   ) => {
     await updateMyDailyStore(values, response, isEdit)
-    updateHouseworkStore(response, isEdit)
+    await updateHouseworkStore(response, isEdit)
   }
 
   const updateMyDailyStore = async (
@@ -46,31 +45,23 @@ export function useHouseworkSubmit() {
     response: MyHouseworkInterface,
     isEdit: boolean
   ) => {
-    if (!houseworkStore.weekTaskList) return
-
-    const dateKey = dayjs(response.startAt).format('YYYY-MM-DD')
-
+    if (!houseworkStore.weekTaskList.value) return
+    const tasks = [
+      ...(houseworkStore.weekTaskList.value as MyHouseworkInterface[]),
+    ]
+    console.log(houseworkStore.weekTaskList)
+    console.log(tasks)
     if (isEdit) {
-      const taskList = houseworkStore.weekTaskList[dateKey]
-      if (!taskList) return
-
-      const index = taskList.findIndex(
-        (housework) => housework.id === response.id
-      )
+      const index = tasks.findIndex((housework) => housework.id === response.id)
       if (index !== -1) {
-        taskList[index] = {
-          ...taskList[index],
-          ...response,
-        }
+        tasks[index] = { ...tasks[index], ...response }
       }
+    } else {
+      tasks.push(response)
     }
 
-    // weekTaskList가 변경된 후 calendarData 갱신
-    houseworkStore.calendarData = houseworkStore.createCalendarData(
-      houseworkStore.startDate,
-      houseworkStore.endDate,
-      houseworkStore.weekTaskList
-    )
+    // weekTaskList만 업데이트
+    houseworkStore.weekTaskList.value = tasks
   }
 
   const updateExistingHousework = (
