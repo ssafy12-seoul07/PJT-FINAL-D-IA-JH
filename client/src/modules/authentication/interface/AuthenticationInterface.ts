@@ -3,7 +3,7 @@ export interface RegisterBodyInterface {
   email: string
   password: string
   familyId: number | null
-  goalKcal: number
+  calorieGoal: number
   profileImageName: string
 }
 
