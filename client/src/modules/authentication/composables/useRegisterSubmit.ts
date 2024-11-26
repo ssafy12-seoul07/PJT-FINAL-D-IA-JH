@@ -12,12 +12,13 @@ export function useRegisterSubmit() {
 
   const handleFinish: FormProps['onFinish'] = async (values) => {
     try {
-      const response = await authAPI.postAuthSignup(
-        values as RegisterBodyInterface
-      )
-      authStore.setAccessToken(response.accessToken)
-      message.success('회원가입되었습니다')
-      router.push({ name: 'MyDaily' })
+      console.log(values)
+      // const response = await authAPI.postAuthSignup(
+      //   values as RegisterBodyInterface
+      // )
+      // authStore.setAccessToken(response.accessToken)
+      // message.success('회원가입되었습니다')
+      // router.push({ name: 'MyDaily' })
     } catch (error) {
       // 에러 처리
       console.error(error)

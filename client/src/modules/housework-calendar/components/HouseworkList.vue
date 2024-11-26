@@ -51,6 +51,7 @@
   import type { HouseworkInterface } from '@/shared/interface/HouseworkInterface'
   import HouseworkTask from '@/shared/components/HouseworkTask.vue'
   import { useUserStore } from '@/modules/authentication/store/user'
+
   const props = defineProps<{
     selectedDateTaskList: HouseworkInterface[]
   }>()
@@ -64,10 +65,13 @@
   })
   const familyList = computed(() => userStore.familyInfo?.members || null)
 
+  import defaultImg from '@/assets/images/defaultImg.jpg'
+
   const getProfileImagePath = (profileImageName: string | null) => {
-    if (!profileImageName)
-      return new URL(`@/assets/images/defaultImg.jpg`, import.meta.url).href
-    return new URL(`@/assets/images/${profileImageName}`, import.meta.url).href
+    if (!profileImageName) return defaultImg
+    // 동적 import를 위해 다음과 같이 사용
+    return new URL(`/src/assets/images/${profileImageName}`, import.meta.url)
+      .href
   }
 
   const currentUserId = ref<number | null>(null)
