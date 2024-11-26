@@ -5,9 +5,10 @@
 | 민인애(팀장) | Figma, 프론트엔드 |
 | 배장한     | ERD, 백엔드     |
 
-[Notion](https://www.notion.so/Health-Kitchen-129e59326f7a806cbffaf2890f07a801)  
-[Figma](https://www.figma.com/design/hKIkH0IpojhDqeF1Qw2K5j/final_pjt?node-id=0-1&t=tKCWinNCdaXFLUjm-1)
----
+### 링크 모음
+
+- [Notion](https://www.notion.so/Health-Kitchen-129e59326f7a806cbffaf2890f07a801)  
+- [Figma](https://www.figma.com/design/hKIkH0IpojhDqeF1Qw2K5j/final_pjt?node-id=0-1&t=tKCWinNCdaXFLUjm-1)
 
 # 기획
 
