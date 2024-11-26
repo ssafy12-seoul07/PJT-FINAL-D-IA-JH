@@ -104,7 +104,7 @@
       justify-content: center;
       align-items: center;
       background-color: var(--background-color);
-      padding: 8px 16px;
+      padding: 16px 16px;
       border-radius: 8px;
 
       &:hover {
