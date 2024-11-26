@@ -19,8 +19,8 @@
       </template>
     </BaseHeader>
     <HouseworkCalendarList />
-    <BottomNavBar />
     <BottomSheet v-if="mode === 'open'" @on-close="handleAction" />
+    <BottomNavBar />
   </div>
 </template>
 

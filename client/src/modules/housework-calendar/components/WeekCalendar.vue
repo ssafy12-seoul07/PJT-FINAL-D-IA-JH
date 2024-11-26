@@ -25,6 +25,7 @@
           :progress="calculateProgressPercentage(date.doneCnt, date.totalCnt)"
           :top="-8"
           :left="-5"
+          :key="calculateProgressPercentage(date.doneCnt, date.totalCnt)"
         />
       </span>
     </div>

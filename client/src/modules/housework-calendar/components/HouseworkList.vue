@@ -128,9 +128,9 @@
       -ms-overflow-style: none; /* IE, Edge */
       scrollbar-width: none; /* Firefox */
 
-      height: 578px; /* 가로가 430 이상일때 */
+      height: 594px; /* 가로가 430 이상일때 */
       @media (max-width: 430px) {
-        height: calc(100vh - 306px); /* 가로가 430 이하일때 */
+        height: calc(100vh - 291px); /* 가로가 430 이하일때 */
       }
 
       h3 {

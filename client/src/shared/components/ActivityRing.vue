@@ -15,7 +15,8 @@
       </div>
       <div class="stat-row housework">
         <span>집안일하기</span
-        ><span>{{ calculatePercentage(burnedKcal, goalKcal) }}%</span
+        ><span
+          >{{ calculatePercentage(doneHouseworkCnt, totalHouseworkCnt) }}%</span
         ><span>{{ doneHouseworkCnt }}/{{ totalHouseworkCnt }}개</span>
       </div>
     </div>
@@ -28,16 +29,20 @@
         :active="false"
         backgroundColor="none"
         :progress="calculateProgressPercentage(burnedKcal, goalKcal)"
+        :key="calculateProgressPercentage(burnedKcal, goalKcal)"
       />
       <CircleProgressComponent
-        :width="71"
-        :height="71"
-        color="#4CAF50"
+        :width="70"
+        :height="70"
+        :color="RING_COLOR['green']"
         backgroundColor="none"
         text=""
         :active="false"
-        :progress="75"
-        :top="6.5"
+        :progress="
+          calculateProgressPercentage(doneHouseworkCnt, totalHouseworkCnt)
+        "
+        :key="calculateProgressPercentage(doneHouseworkCnt, totalHouseworkCnt)"
+        :top="7.5"
         :left="6.5"
       />
     </div>
@@ -73,8 +78,7 @@
     value: number,
     maxValue: number
   ): number => {
-    return 100
-    if (maxValue === 0) return 0
+    if (maxValue === 0 || value === 0) return 1
     return (value / maxValue) * 100
   }
 </script>
